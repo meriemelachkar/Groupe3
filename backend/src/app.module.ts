@@ -12,7 +12,7 @@ import { TestModule } from './test/test.module';
     }),
 
     // 2️⃣ Connexion à MongoDB avec l’URL du .env
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forRoot(process.env.MONGO_URI!),
 
     TestModule,
 
