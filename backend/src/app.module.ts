@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { ProjetsModule } from './modules/projets/projets.module';
 import jwtConfig from './config/jwt.config';
 import databaseConfig from './config/database.config';
 
@@ -22,6 +23,7 @@ import databaseConfig from './config/database.config';
 
     UsersModule,
     AuthModule,
+    ProjetsModule,
   ],
 })
 export class AppModule {}

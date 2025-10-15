@@ -10,7 +10,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @Roles('admin') // seuls les admins peuvent lister tous les users
+  @Roles('admin','investisseur') // seuls les admins peuvent lister tous les users
   findAll() {
     return this.usersService.findAll();
   }
