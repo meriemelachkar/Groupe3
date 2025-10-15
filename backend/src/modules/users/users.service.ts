@@ -5,7 +5,7 @@ import { User } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>) { }
 
   async create(data: Partial<User>): Promise<User> {
     const createdUser = new this.userModel(data);
@@ -15,4 +15,9 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ email }).exec();
   }
+  
+  async findAll() {
+    return this.userModel.find().select('-motDePasse'); // retourne tous les users sans le mot de passe
+  }
+
 }

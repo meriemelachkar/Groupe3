@@ -1,4 +1,17 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @Controller('users')
-export class UsersController {}
+@UseGuards(JwtAuthGuard, RolesGuard) // protège tout le contrôleur
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get()
+  @Roles('admin') // seuls les admins peuvent lister tous les users
+  findAll() {
+    return this.usersService.findAll();
+  }
+}
