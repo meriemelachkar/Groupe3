@@ -3,15 +3,22 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import jwtConfig from './config/jwt.config';
+import databaseConfig from './config/database.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,         // ✅ rend ConfigModule accessible partout
-      envFilePath: '.env',    // ✅ charge ton .env à la racine
+      isGlobal: true,
+      load: [jwtConfig, databaseConfig], // 👈 charge tes fichiers config
     }),
 
-    MongooseModule.forRoot(process.env.MONGO_URI ?? (() => { throw new Error('MONGO_URI is not defined'); })()),
+    MongooseModule.forRootAsync({
+      inject: [databaseConfig.KEY],
+      useFactory: (dbConfig: any) => ({
+        uri: dbConfig.uri,
+      }),
+    }),
 
     UsersModule,
     AuthModule,
