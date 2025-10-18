@@ -66,4 +66,10 @@ export class AdminController {
   deleteMessage(@Param('id') id: string) {
     return this.adminService.deleteMessage(id);
   }
+  // 📊 Tableau de bord admin
+@Get('dashboard')
+getDashboard() {
+  return this.adminService.getDashboard();
+}
+
 }

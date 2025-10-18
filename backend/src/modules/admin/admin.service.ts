@@ -78,4 +78,53 @@ export class AdminService {
     if (!res) throw new NotFoundException('Message introuvable');
     return { message: 'Message supprimé' };
   }
+
+  async getDashboard() {
+  // Nombre d’utilisateurs
+  const totalUsers = await this.userModel.countDocuments();
+
+  // Nombre de projets (et par statut)
+  const totalProjets = await this.projetModel.countDocuments();
+  const projetsStats = await this.projetModel.aggregate([
+    { $group: { _id: '$statut', count: { $sum: 1 } } },
+  ]);
+
+  // Montant total investi
+  const totalInvestissements = await this.investissementModel.countDocuments();
+  const montantInvesti = await this.investissementModel.aggregate([
+    { $group: { _id: null, total: { $sum: '$montantInvesti' } } },
+  ]);
+
+  // Montant total des transactions
+  const totalTransactions = await this.transactionModel.countDocuments();
+  const montantTransactions = await this.transactionModel.aggregate([
+    { $group: { _id: null, total: { $sum: '$montant' } } },
+  ]);
+
+  // Nombre de messages
+  const totalMessages = await this.messageModel.countDocuments();
+
+  return {
+    utilisateurs: totalUsers,
+    projets: {
+      total: totalProjets,
+      details: projetsStats.reduce((acc, cur) => {
+        acc[cur._id] = cur.count;
+        return acc;
+      }, {}),
+    },
+    investissements: {
+      total: totalInvestissements,
+      montantTotal: montantInvesti[0]?.total || 0,
+    },
+    transactions: {
+      total: totalTransactions,
+      montantTotal: montantTransactions[0]?.total || 0,
+    },
+    messages: totalMessages,
+  };
 }
+
+}
+
+
