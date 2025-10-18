@@ -8,6 +8,7 @@ import { InvestissementsModule } from './modules/investissements/investissements
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { BiensModule } from './modules/biens/biens.module';
 import { MessagesModule } from './modules/messages/messages.module';
+import { AdminModule } from './modules/admin/admin.module';
 import jwtConfig from './config/jwt.config';
 import databaseConfig from './config/database.config';
 
@@ -32,6 +33,7 @@ import databaseConfig from './config/database.config';
     TransactionsModule,
     BiensModule,
     MessagesModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
