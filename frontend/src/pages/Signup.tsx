@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import NavBar from "../components/navbar";
+import NavBar from "../components/Navbar";
 import { UserPlus } from "lucide-react";
 import { registerUser } from "../api/authApi";
 
@@ -181,7 +181,9 @@ export default function SignUp() {
           <div className="mt-6 text-center">
             <p className="text-slate-600">
               Déjà un compte ?{" "}
-              <button className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <button 
+                onClick={() => (window.location.href = '/Login')}
+                className="text-emerald-600 hover:text-emerald-700 font-medium">
                 Se connecter
               </button>
             </p>
