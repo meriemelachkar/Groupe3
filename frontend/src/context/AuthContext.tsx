@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { registerUser, loginUser } from '../api/authApi';
 
+// --- TYPES (PAS DE CHANGEMENT NÉCESSAIRE ICI) ---
 export interface Profile {
-    id: string;
+    id: string; // L'ID utilisateur
     prenom: string;
     nom: string;
     email: string;
@@ -20,9 +21,12 @@ interface AuthContextType {
         role: string;
         password: string;
     }) => Promise<void>;
-    signIn: (data: { email: string; motDePasse: string }) => Promise<void>;
+    // Changement de la signature pour retourner l'userId, utile pour les actions immédiates post-connexion
+    signIn: (data: { email: string; motDePasse: string }) => Promise<string>;
     signOut: () => void;
 }
+// ---------------------------------------------------
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -48,6 +52,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser({ token, userId });
             if (storedProfile) {
                 setProfile(JSON.parse(storedProfile));
+            } else {
+                // Tenter de recharger le profil si seulement le token/userId est là
+                // Note : Pour une application réelle, vous voudriez peut-être appeler loadProfile ici
+                // si le profil n'est pas dans localStorage, mais ça pourrait être coûteux au démarrage.
             }
         }
         setLoading(false);
@@ -56,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Fonction pour charger le profil depuis le backend
     const loadProfile = async (userId: string, token: string) => {
         try {
+            // Assurez-vous que l'URL est correcte et pointe vers un endpoint qui retourne le profil complet
             const res = await fetch(`http://localhost:3000/users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -65,11 +74,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const data = await res.json();
 
             const profileData: Profile = {
-                id: data._id,
-                prenom: data.prenom,
-                nom: data.nom,
-                email: data.email,
-                role: data.role,
+                // 💡 ASSUREZ-VOUS QUE data._id EST DE TYPE string
+                id: data._id as string, 
+                prenom: data.prenom as string,
+                nom: data.nom as string,
+                email: data.email as string,
+                role: data.role as string,
             };
 
             setProfile(profileData);
@@ -97,29 +107,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const signIn = async (data: { email: string; motDePasse: string }) => {
+    // 🚀 MODIFICATIONS PRINCIPALES DANS signIn 🚀
+    const signIn = async (data: { email: string; motDePasse: string }): Promise<string> => { // Changement du type de retour
         try {
             const res = await loginUser(data);
             console.log('Connexion réussie:', res);
 
-            const token = res.token;
-            const userId = res.user._id;
-            const userName = res.user.nom; 
+            const token: string = res.token;
+            // 💡 Récupération de l'ID depuis la réponse du backend
+            const userId: string = res.user._id; 
+            console.log('User reçu du backend:', res.user);
+
+            // Mise à jour de l'état (asynchrone)
             setUser({ token, userId });
 
-            // Sauvegarder dans localStorage
+            // Sauvegarder dans localStorage (synchrone et immédiat)
             localStorage.setItem('token', token);
             localStorage.setItem('userId', userId);
-            localStorage.setItem('userName', userName);
+            // Je supprime localStorage.setItem('userName', userName) car 'profile' contient le nom complet
 
-            
+            // Chargement et sauvegarde du profil
             await loadProfile(userId, token);
+            
+            // Retourne l'ID pour une utilisation immédiate dans le composant appelant
+            return userId; 
+
         } catch (err) {
             console.error('Erreur connexion:', err);
             throw err;
         }
     };
-
 
 
     const signOut = () => {
@@ -128,6 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('profile');
+        // Optionnel : recharger la page ou rediriger ici
     };
 
     return (
