@@ -19,5 +19,9 @@ export class UsersService {
   async findAll() {
     return this.userModel.find().select('-motDePasse'); // retourne tous les users sans le mot de passe
   }
+  async findById(id: string) {
+  return this.userModel.findById(id).select('-motDePasse');
+}
+
 
 }
