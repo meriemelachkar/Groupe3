@@ -1,7 +1,14 @@
 import NavBar from "../components/Navbar";
 import { TrendingUp, Building2, DollarSign, Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  const onNavigate = (path: string) => {
+    navigate(`/${path}`);
+  };
+  
   return (
     <>
       <NavBar />
@@ -19,13 +26,13 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <button
-                  // onClick={() => onNavigate('projects')}
+                  onClick={() => onNavigate('projects')}
                   className="bg-emerald-600 hover:bg-emerald-700 px-8 py-4 rounded-lg font-medium text-lg transition shadow-lg"
                 >
                   Explorer les Projets
                 </button>
                 <button
-                  // onClick={() => onNavigate('properties')}
+                  onClick={() => onNavigate('properties')}
                   className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-lg font-medium text-lg transition shadow-lg"
                 >
                   Voir les Biens
@@ -97,7 +104,7 @@ export default function Home() {
                   diversifiez votre portefeuille.
                 </p>
                 <button
-                  // onClick={() => onNavigate('projects')}
+                  onClick={() => onNavigate('projects')}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition"
                 >
                   Découvrir les Projets
@@ -181,7 +188,7 @@ export default function Home() {
                   simulez votre prêt et accédez à la propriété en toute simplicité.
                 </p>
                 <button
-                  // onClick={() => onNavigate('properties')}
+                  onClick={() => onNavigate('properties')}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition"
                 >
                   Voir les Biens Disponibles
@@ -198,7 +205,7 @@ export default function Home() {
               Rejoignez des milliers d'investisseurs et acheteurs qui ont choisi BuildWealth
             </p>
             <button
-              // onClick={() => onNavigate('signup')}
+              onClick={() => onNavigate('SignUp')}
               className="bg-white text-emerald-600 hover:bg-slate-100 px-8 py-4 rounded-lg font-medium text-lg transition shadow-lg"
             >
               Créer un compte gratuit
