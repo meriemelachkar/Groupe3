@@ -25,6 +25,7 @@ export default function Navbar({ currentPage = "" }: NavbarProps) {
                             onClick={() => onNavigate("")}
                             className="flex items-center gap-2 font-bold text-xl hover:text-emerald-400 transition"
                         >
+                            <Building2 size={28} />
                             BuildWealth
                         </button>
 

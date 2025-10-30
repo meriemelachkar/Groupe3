@@ -9,6 +9,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
 import { BiensModule } from './modules/biens/biens.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { ReservationsModule } from './modules/reservations/reservations.module';
 import jwtConfig from './config/jwt.config';
 import databaseConfig from './config/database.config';
 
@@ -31,8 +32,9 @@ import databaseConfig from './config/database.config';
     ProjetsModule,
     InvestissementsModule,
     TransactionsModule,
-    BiensModule,
-    MessagesModule,
+  BiensModule,
+  ReservationsModule,
+  MessagesModule,
     AdminModule,
   ],
 })

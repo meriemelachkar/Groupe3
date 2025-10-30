@@ -13,33 +13,33 @@ import { Roles } from '../../common/decorators/roles.decorator';
 export class BiensController {
   constructor(private readonly biensService: BiensService) {}
 
-  // 📄 Tous les biens (public)
+  // Tous les biens (public)
   @Get()
   async findAll() {
     return this.biensService.findAll();
   }
 
-  // 🔍 Détails d’un bien
+  // Détails d’un bien
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.biensService.findById(id);
   }
 
-  // 🏗️ Créer un bien (promoteur uniquement)
+  // Créer un bien (promoteur uniquement)
   @Post()
   @Roles('promoteur')
   async create(@Body() dto: CreateBienDto, @Request() req) {
     return this.biensService.create(dto, req.user.userId);
   }
 
-  // ✏️ Modifier un bien (promoteur ou admin)
+  // Modifier un bien (promoteur ou admin)
   @Patch(':id')
   @Roles('promoteur', 'admin')
   async update(@Param('id') id: string, @Body() dto: UpdateBienDto) {
     return this.biensService.update(id, dto);
   }
 
-  // ❌ Supprimer un bien (admin)
+  // Supprimer un bien (admin)
   @Delete(':id')
   @Roles('admin')
   async remove(@Param('id') id: string) {

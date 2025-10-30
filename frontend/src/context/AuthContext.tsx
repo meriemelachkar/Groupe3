@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { registerUser, loginUser } from '../api/authApi';
 
-// --- TYPES (PAS DE CHANGEMENT NÉCESSAIRE ICI) ---
+
 export interface Profile {
     id: string; // L'ID utilisateur
     prenom: string;
@@ -21,7 +21,6 @@ interface AuthContextType {
         role: string;
         password: string;
     }) => Promise<void>;
-    // Changement de la signature pour retourner l'userId, utile pour les actions immédiates post-connexion
     signIn: (data: { email: string; motDePasse: string }) => Promise<string>;
     signOut: () => void;
 }
@@ -107,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    // 🚀 MODIFICATIONS PRINCIPALES DANS signIn 🚀
+    
     const signIn = async (data: { email: string; motDePasse: string }): Promise<string> => { // Changement du type de retour
         try {
             const res = await loginUser(data);
@@ -145,7 +144,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('profile');
-        // Optionnel : recharger la page ou rediriger ici
     };
 
     return (
