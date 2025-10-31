@@ -9,7 +9,10 @@ export class Reservation extends Document {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   buyerId: string;
 
-  @Prop({ enum: ['pending', 'accepted', 'rejected'], default: 'pending' })
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  promoteurId?: string;
+
+  @Prop({ enum: ['en_attente', 'accepte', 'rejete'], default: 'en_attente' })
   status: string;
 
   @Prop({ type: Object })

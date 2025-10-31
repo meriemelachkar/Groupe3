@@ -56,11 +56,11 @@ export const Messages: React.FC = () => {
                 const e = m.expediteurId;
                 const d = m.destinataireId;
                 if (e && e._id && e._id !== user?.userId) others[e._id] = { _id: e._id, nom: e.nom, prenom: e.prenom, email: e.email };
-                if (d && d._id && d._id !== user?.userId) others[d._1d] = { _id: d._id, nom: d.nom, prenom: d.prenom, email: d.email };
+                if (d && d._id && d._id !== user?.userId) others[d._id] = { _id: d._id, nom: d.nom, prenom: d.prenom, email: d.email };
             });
             setUsers(Object.values(others));
         } catch (error) {
-            console.error('Error loading messages:', error);
+            console.error('Erreur lors du chargement des messages :', error);
         } finally {
             setLoading(false);
         }
@@ -73,7 +73,7 @@ export const Messages: React.FC = () => {
             await api.patch(`/messages/${messageId}/lu`);
             loadMessages();
         } catch (error) {
-            console.error('Error marking message as read:', error);
+            console.error("Erreur lors du marquage du message comme lu :", error);
         }
     };
 
@@ -98,7 +98,7 @@ export const Messages: React.FC = () => {
             setShowNewMessage(false);
             loadMessages();
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error("Erreur lors de l'envoi du message :", error);
         }
     };
 

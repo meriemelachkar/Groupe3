@@ -19,6 +19,13 @@ export class BiensController {
     return this.biensService.findAll();
   }
 
+  // Biens du promoteur connecté
+  @Get('me')
+  @Roles('promoteur')
+  async findMine(@Request() req) {
+    return this.biensService.findByProprietaire(req.user.userId);
+  }
+
   // Détails d’un bien
   @Get(':id')
   async findOne(@Param('id') id: string) {

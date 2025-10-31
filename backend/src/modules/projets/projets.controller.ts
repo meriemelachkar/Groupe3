@@ -19,6 +19,14 @@ export class ProjetsController {
     return this.projetsService.findAll();
   }
 
+  // Projets du promoteur connecté
+  @Get('me')
+  @Roles('promoteur')
+  async findMine(@Request() req) {
+    const promoteurId = req.user.userId;
+    return this.projetsService.findByPromoteur(promoteurId);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.projetsService.findOne(id);

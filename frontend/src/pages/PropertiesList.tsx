@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Home } from 'lucide-react';
+import { MapPin, Home, Trash2 } from 'lucide-react';
 import NavBar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
-import { fetchBiens, createBien } from "../api/propertiesApi";
+import { fetchBiens, createBien, deleteBien } from "../api/propertiesApi";
 
 interface Proprietaire {
   _id: string;
@@ -63,7 +63,7 @@ const PropertiesList: React.FC = () => {
         return;
       }
 
-  const data = await fetchBiens();
+      const data = await fetchBiens();
       setProperties(data as any);
     } catch (error) {
       console.error('Erreur lors du chargement des biens:', error);
@@ -139,11 +139,13 @@ const PropertiesList: React.FC = () => {
       <NavBar />
       <div className="min-h-[calc(100vh-4rem)] bg-slate-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Biens Immobiliers à Vendre</h1>
-            <p className="text-slate-600">
-              Découvrez notre sélection de biens de qualité
-            </p>
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">Biens Immobiliers à Vendre</h1>
+              <p className="text-slate-600">
+                Découvrez notre sélection de biens de qualité
+              </p>
+            </div>
             {profile?.role === 'promoteur' && (
               <div className="mt-4">
                 <button
@@ -244,9 +246,32 @@ const PropertiesList: React.FC = () => {
                       <div className="text-sm text-slate-600 mb-3">
                         {getPropertyTypeLabel(property.typeBien)}
                       </div>
-                      <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition">
-                        Voir les détails
-                      </button>
+                      <div className="flex gap-2">
+                        <button className="flex-1 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition">
+                          Voir les détails
+                        </button>
+
+                        {profile?.role === 'admin' && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (!confirm('Voulez-vous supprimer ce bien ? Cette action est irréversible.')) return;
+                              try {
+                                await deleteBien(property._id);
+                                // retirer localement sans recharger toute la page
+                                setProperties((prev) => prev.filter((p) => p._id !== property._id));
+                              } catch (err: any) {
+                                console.error('Erreur suppression bien:', err);
+                                alert(err?.response?.data?.message || err?.message || 'Erreur lors de la suppression');
+                              }
+                            }}
+                            className="p-2 bg-red-100 hover:bg-red-200 rounded text-red-700 transition"
+                            title="Supprimer le bien"
+                          >
+                            <Trash2 />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );

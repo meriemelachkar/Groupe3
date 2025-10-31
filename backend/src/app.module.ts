@@ -10,6 +10,7 @@ import { BiensModule } from './modules/biens/biens.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import jwtConfig from './config/jwt.config';
 import databaseConfig from './config/database.config';
 
@@ -36,6 +37,7 @@ import databaseConfig from './config/database.config';
   ReservationsModule,
   MessagesModule,
     AdminModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}

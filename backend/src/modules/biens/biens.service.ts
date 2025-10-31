@@ -18,6 +18,10 @@ export class BiensService {
     return this.bienModel.find().populate('proprietaireId', 'nom prenom email');
   }
 
+  async findByProprietaire(proprietaireId: string): Promise<BienImmobilier[]> {
+    return this.bienModel.find({ proprietaireId }).populate('proprietaireId', 'nom prenom email');
+  }
+
   async findById(id: string): Promise<BienImmobilier> {
     const bien = await this.bienModel.findById(id);
     if (!bien) throw new NotFoundException('Bien immobilier non trouvé');

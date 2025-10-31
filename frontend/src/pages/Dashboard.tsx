@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, Building2, Home, DollarSign, Target } from 'lucide-react';
 import api from '../api/api';
+import type { Bien as BienType } from '../api/propertiesApi';
 import { cancelReservation } from '../api/reservationsApi';
 import { useAuth } from '../context/AuthContext';
 import NavBar from "../components/Navbar";
+import PropertyReservations from '../components/PropertyReservations';
 
 export const Dashboard: React.FC = () => {
     const { profile, user } = useAuth();
     const [investments, setInvestments] = useState<any[]>([]);
     const [reservations, setReservations] = useState<any[]>([]);
     const [projects, setProjects] = useState<any[]>([]);
+    const [biens, setBiens] = useState<BienType[]>([]);
+    const [selectedBien, setSelectedBien] = useState<BienType | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -45,18 +49,33 @@ export const Dashboard: React.FC = () => {
 
             try {
                 if (profile?.role === 'promoteur') {
-                    const res = await api.get('/projets');
-                    const all = res.data || [];
-                    // filter projects by promoteurId if present
-                    const mine = all.filter((p: any) => String(p.promoteurId) === String(user?.userId));
-                    setProjects(mine);
+                    // Use backend dashboard module which returns biens + reservations summary
+                    try {
+                        const dash = await api.get('/dashboard/promoteur');
+                        const data = dash.data || {};
+                        setBiens(data.biens || []);
+                        setReservations(data.reservations || []);
+                        // keep projects fetched separately (projects endpoint still used)
+                        try {
+                            const res = await api.get('/projets/me');
+                            setProjects(res.data || []);
+                        } catch (err) {
+                            console.warn('Impossible de charger les projets du promoteur:', err);
+                            setProjects([]);
+                        }
+                    } catch (err) {
+                        console.warn('Impossible de charger le tableau de bord promoteur:', err);
+                        setBiens([]);
+                        setReservations([]);
+                        setProjects([]);
+                    }
                 }
             } catch (err) {
                 console.warn('Impossible de charger les projets:', err);
                 setProjects([]);
             }
         } catch (error) {
-            console.error('Error loading dashboard data:', error);
+                console.error('Erreur lors du chargement des données du tableau de bord :', error);
         } finally {
             setLoading(false);
         }
@@ -82,6 +101,26 @@ export const Dashboard: React.FC = () => {
         };
     };
 
+    const toNum = (v: any) => {
+        const n = Number(v ?? 0);
+        return Number.isFinite(n) ? n : 0;
+    };
+
+    // Helper to produce a localized badge for project status (supports French and older English keys)
+    const getProjectStatusBadge = (status: string) => {
+        const s = (status || '').toString();
+        const map: Record<string, { label: string; cls: string }> = {
+            en_cours: { label: 'En financement', cls: 'bg-emerald-100 text-emerald-800' },
+            financé: { label: 'Financé', cls: 'bg-slate-100 text-slate-800' },
+            terminé: { label: 'Terminé', cls: 'bg-slate-200 text-slate-800' },
+            // older English values
+            funding: { label: 'En financement', cls: 'bg-emerald-100 text-emerald-800' },
+            funded: { label: 'Financé', cls: 'bg-slate-100 text-slate-800' },
+            approved: { label: 'Approuvé', cls: 'bg-blue-100 text-blue-800' },
+        };
+        return map[s] || map['en_cours'];
+    };
+
     const handleCancel = async (reservationId: string) => {
         if (!reservationId) return;
         if (!confirm('Voulez-vous annuler cette réservation ?')) return;
@@ -97,14 +136,14 @@ export const Dashboard: React.FC = () => {
     };
 
     const calculateTotalInvested = () => {
-        return investments.reduce((sum, inv) => sum + inv.amount, 0);
+        return investments.reduce((sum, inv) => sum + (inv?.amount ?? 0), 0);
     };
 
     const calculateExpectedReturns = () => {
         return investments.reduce((sum, inv) => {
-            if (inv.project) {
-                return sum + (inv.amount * inv.project.expected_return) / 100;
-            }
+            const amt = toNum(inv?.amount);
+            const rate = toNum(inv?.project?.expected_return);
+            if (amt && rate) return sum + (amt * rate) / 100;
             return sum;
         }, 0);
     };
@@ -197,7 +236,7 @@ export const Dashboard: React.FC = () => {
                                         </thead>
                                         <tbody className="divide-y divide-slate-200">
                                             {investments.map((investment) => (
-                                                <tr key={investment.id} className="hover:bg-slate-50">
+                                                <tr key={investment._id || investment.id} className="hover:bg-slate-50">
                                                     <td className="px-6 py-4">
                                                         <div className="font-medium text-slate-900">
                                                             {investment.project?.title || 'N/A'}
@@ -207,13 +246,13 @@ export const Dashboard: React.FC = () => {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 font-semibold text-slate-900">
-                                                        {investment.amount.toLocaleString('fr-FR')} €
+                                                        {(investment.amount ?? 0).toLocaleString('fr-FR')} €
                                                     </td>
                                                     <td className="px-6 py-4 text-emerald-600">
                                                         {investment.project?.expected_return || 0}%
                                                     </td>
                                                     <td className="px-6 py-4 font-semibold text-emerald-600">
-                                                        +{((investment.amount * (investment.project?.expected_return || 0)) / 100).toLocaleString('fr-FR')} €
+                                                            +{((toNum(investment.amount) * toNum(investment.project?.expected_return)) / 100).toLocaleString('fr-FR')} €
                                                     </td>
                                                     <td className="px-6 py-4 text-slate-600">
                                                         {new Date(investment.investment_date).toLocaleDateString('fr-FR')}
@@ -263,7 +302,7 @@ export const Dashboard: React.FC = () => {
                                     </div>
                                     <div className="text-3xl font-bold text-slate-900">
                                         {reservations
-                                            .reduce((sum, res) => sum + (res.propertyId?.prix || 0), 0)
+                                            .reduce((sum, res) => sum + (res.propertyId?.prix ?? 0), 0)
                                             .toLocaleString('fr-FR')}{' '}
                                         €
                                     </div>
@@ -284,16 +323,17 @@ export const Dashboard: React.FC = () => {
                                                     </h3>
                                                     <p className="text-slate-600">{reservation.propertyId?.adresse}</p>
                                                 </div>
-                                                <span
-                                                    className={`px-3 py-1 rounded-full text-xs font-medium ${reservation.status === 'accepted' || reservation.status === 'confirmed'
-                                                            ? 'bg-emerald-100 text-emerald-800'
-                                                            : reservation.status === 'pending'
-                                                                ? 'bg-yellow-100 text-yellow-800'
-                                                                : 'bg-red-100 text-red-800'
-                                                        }`}
-                                                >
-                                                    {reservation.status}
-                                                </span>
+                                                {(() => {
+                                                    // adapter les statuts côté client aux nouveaux valeurs françaises
+                                                    const s = reservation.status;
+                                                    const label = s === 'en_attente' ? 'En attente' : s === 'accepte' ? 'Acceptée' : 'Rejetée';
+                                                    const cls = s === 'accepte' ? 'bg-emerald-100 text-emerald-800' : s === 'en_attente' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
+                                                    return (
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${cls}`}>
+                                                            {label}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </div>
 
                                             <div className="grid md:grid-cols-3 gap-4">
@@ -434,25 +474,24 @@ export const Dashboard: React.FC = () => {
                                 </div>
                                 <div className="divide-y divide-slate-200">
                                     {projects.map((project) => {
-                                        const progress = Math.min(
-                                            (project.raised_amount / project.target_amount) * 100,
-                                            100
-                                        );
+                                        const raised = toNum(project.raised_amount ?? project.montantCollecte ?? project.raised);
+                                        const target = toNum(project.target_amount ?? project.montantTotal ?? project.target);
+                                        const progress = target === 0 ? 0 : Math.min((raised / target) * 100, 100);
                                         return (
-                                            <div key={project.id} className="p-6 hover:bg-slate-50">
+                                            <div key={project._id || project.id} className="p-6 hover:bg-slate-50">
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
                                                         <h3 className="font-semibold text-slate-900 text-lg">{project.title}</h3>
                                                         <p className="text-slate-600">{project.location}</p>
                                                     </div>
-                                                    <span
-                                                        className={`px-3 py-1 rounded-full text-xs font-medium ${project.status === 'funding'
-                                                                ? 'bg-emerald-100 text-emerald-800'
-                                                                : 'bg-slate-100 text-slate-800'
-                                                            }`}
-                                                    >
-                                                        {project.status}
-                                                    </span>
+                                                    {(() => {
+                                                        const badge = getProjectStatusBadge(project.statut || (project as any).status || 'en_cours');
+                                                        return (
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${badge.cls}`}>
+                                                                    {badge.label}
+                                                                </span>
+                                                        );
+                                                    })()}
                                                 </div>
                                                 <div className="mb-4">
                                                     <div className="flex justify-between text-sm mb-1">
@@ -472,25 +511,25 @@ export const Dashboard: React.FC = () => {
                                                     <div>
                                                         <div className="text-sm text-slate-600">Objectif</div>
                                                         <div className="font-semibold text-slate-900">
-                                                            {project.target_amount.toLocaleString('fr-FR')} €
+                                                            {(toNum(project.target_amount ?? project.montantTotal ?? project.target)).toLocaleString('fr-FR')} €
                                                         </div>
                                                     </div>
                                                     <div>
                                                         <div className="text-sm text-slate-600">Collecté</div>
                                                         <div className="font-semibold text-emerald-600">
-                                                            {project.raised_amount.toLocaleString('fr-FR')} €
+                                                            {(toNum(project.raised_amount ?? project.montantCollecte ?? project.raised)).toLocaleString('fr-FR')} €
                                                         </div>
                                                     </div>
                                                     <div>
                                                         <div className="text-sm text-slate-600">Rendement</div>
                                                         <div className="font-semibold text-slate-900">
-                                                            {project.expected_return}%
+                                                            {(project.expected_return ?? project.rendement ?? '—')}%
                                                         </div>
                                                     </div>
                                                     <div>
                                                         <div className="text-sm text-slate-600">Durée</div>
                                                         <div className="font-semibold text-slate-900">
-                                                            {project.duration_months} mois
+                                                            {(project.duration_months ?? project.duration ?? project.duree ?? '—')} mois
                                                         </div>
                                                     </div>
                                                 </div>
@@ -506,6 +545,83 @@ export const Dashboard: React.FC = () => {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Mes Biens (pour promoteur) */}
+                            <div className="grid md:grid-cols-3 gap-6 my-8">
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="bg-emerald-100 p-2 rounded">
+                                            <Building2 className="text-emerald-600" size={24} />
+                                        </div>
+                                        <div className="text-sm text-slate-600">Biens</div>
+                                    </div>
+                                    <div className="text-3xl font-bold text-slate-900">{biens.length}</div>
+                                </div>
+
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="bg-emerald-100 p-2 rounded">
+                                            <Home className="text-emerald-600" size={24} />
+                                        </div>
+                                        <div className="text-sm text-slate-600">Disponibles</div>
+                                    </div>
+                                    <div className="text-3xl font-bold text-slate-900">{biens.filter(b => b.statut === 'disponible').length}</div>
+                                </div>
+
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="bg-emerald-100 p-2 rounded">
+                                            <DollarSign className="text-emerald-600" size={24} />
+                                        </div>
+                                        <div className="text-sm text-slate-600">Valeur Totale</div>
+                                    </div>
+                                    <div className="text-3xl font-bold text-emerald-600">
+                                        {biens.reduce((sum, b) => sum + (b.prix || 0), 0).toLocaleString('fr-FR')} €
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
+                                <div className="p-6 border-b border-slate-200">
+                                    <h2 className="text-xl font-bold text-slate-900">Mes Biens</h2>
+                                </div>
+                                <div className="divide-y divide-slate-200">
+                                    {biens.map((b) => (
+                                        <div key={b._id} className="p-6 hover:bg-slate-50 flex justify-between items-center">
+                                            <div>
+                                                <h3 className="font-semibold text-slate-900">{b.titre}</h3>
+                                                <p className="text-slate-600 text-sm">{b.adresse}</p>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-right">
+                                                    <div className="text-sm text-slate-600">Prix</div>
+                                                    <div className="font-semibold text-slate-900">{(b.prix || 0).toLocaleString('fr-FR')} €</div>
+                                                </div>
+                                                <div>
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${b.statut === 'disponible' ? 'bg-emerald-100 text-emerald-800' : b.statut === 'réservé' ? 'bg-yellow-100 text-yellow-800' : 'bg-slate-100 text-slate-800'}`}>
+                                                        {b.statut}
+                                                    </span>
+                                                </div>
+                                                <button onClick={() => setSelectedBien(b)} className="px-4 py-2 bg-emerald-600 text-white rounded">Voir</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {biens.length === 0 && (
+                                        <div className="p-12 text-center">
+                                            <Home className="mx-auto text-slate-400 mb-4" size={48} />
+                                            <h3 className="text-lg font-semibold text-slate-900 mb-2">Aucun bien</h3>
+                                            <p className="text-slate-600">Ajoutez des biens depuis la page Propriétés</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            {selectedBien && (
+                                <PropertyReservations
+                                    propertyId={selectedBien._id}
+                                    onClose={() => setSelectedBien(null)}
+                                    onUpdated={() => loadDashboardData()}
+                                />
+                            )}
                         </>
                     )}
                 </div>

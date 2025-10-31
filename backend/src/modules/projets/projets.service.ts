@@ -18,6 +18,10 @@ export class ProjetsService {
     return this.projetModel.find().populate('promoteurId', 'nom prenom email');
   }
 
+  async findByPromoteur(promoteurId: string): Promise<Projet[]> {
+    return this.projetModel.find({ promoteurId }).populate('promoteurId', 'nom prenom email');
+  }
+
   async findOne(id: string): Promise<Projet> {
     const projet = await this.projetModel.findById(id);
     if (!projet) throw new NotFoundException('Projet non trouvé');

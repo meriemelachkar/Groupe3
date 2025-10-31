@@ -25,7 +25,7 @@ export const fetchBiens = async (): Promise<Bien[]> => {
 };
 
 export const fetchBienById = async (id: string): Promise<Bien> => {
-  if (!id) throw new Error('fetchBienById: id manquant');
+  if (!id) throw new Error('ID du bien manquant (fetchBienById)');
   const res = await api.get(`/biens/${id}`);
   return res.data;
 };
@@ -36,12 +36,18 @@ export const createBien = async (data: Partial<Bien>): Promise<Bien> => {
 };
 
 export const updateBien = async (id: string, data: Partial<Bien>): Promise<Bien> => {
-  if (!id) throw new Error('updateBien: id manquant');
+  if (!id) throw new Error('ID du bien manquant (updateBien)');
   const res = await api.patch(`/biens/${id}`, data);
   return res.data;
 };
 
 export const createReservation = async (propertyId: string, loanSimulation?: any) => {
   const res = await api.post('/reservations', { propertyId, loanSimulation });
+  return res.data;
+};
+
+export const deleteBien = async (id: string) => {
+  if (!id) throw new Error('ID du bien manquant (deleteBien)');
+  const res = await api.delete(`/biens/${id}`);
   return res.data;
 };

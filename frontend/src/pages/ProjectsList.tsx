@@ -13,6 +13,14 @@ interface ProjectsListProps {
 export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) => {
     const [projects, setProjects] = useState<Projet[]>([]);
     const [loading, setLoading] = useState(true);
+    const [filters, setFilters] = useState({
+        titre: '',
+        localisation: '',
+        typeProjet: '',
+        statut: '',
+        minMontant: '',
+        maxMontant: '',
+    });
     const { profile } = useAuth();
     const navigate = useNavigate();
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -35,7 +43,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
             // backend returns an array of Projet objects
             setProjects(res.data || []);
         } catch (error) {
-            console.error('Error loading projects:', error);
+              console.error('Erreur lors du chargement des projets :', error);
         } finally {
             setLoading(false);
         }
@@ -59,6 +67,28 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
         if (status === 'funded') return badges.financé;
         return badges[status] || badges.en_cours;
     };
+
+    // Filtrage côté client basé sur les critères sélectionnés
+    const filteredProjects = projects.filter((project) => {
+        // titre
+        if (filters.titre && !(project.titre || '').toLowerCase().includes(filters.titre.toLowerCase())) return false;
+        // localisation
+        if (filters.localisation && !(project.localisation || '').toLowerCase().includes(filters.localisation.toLowerCase())) return false;
+        // type de projet
+        if (filters.typeProjet && (project.typeProjet || '') !== filters.typeProjet) return false;
+        // statut
+        if (filters.statut) {
+            const s = (project.statut || (project as any).status || '').toString();
+            if (s !== filters.statut) return false;
+        }
+        // montant min
+        if (filters.minMontant && Number(project.montantTotal || 0) < Number(filters.minMontant)) return false;
+        // montant max
+        if (filters.maxMontant && Number(project.montantTotal || 0) > Number(filters.maxMontant)) return false;
+        return true;
+    });
+
+    const resetFilters = () => setFilters({ titre: '', localisation: '', typeProjet: '', statut: '', minMontant: '', maxMontant: '' });
 
     if (loading) {
         return (
@@ -89,6 +119,54 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
                         )}
                     </div>
 
+                    {/* Filtres pour les projets */}
+                    <div className="bg-white rounded-lg shadow p-6 mb-6">
+                        <h2 className="text-lg font-semibold text-slate-900 mb-4">Filtres</h2>
+                        <div className="grid md:grid-cols-4 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Titre</label>
+                                <input value={filters.titre} onChange={(e) => setFilters({ ...filters, titre: e.target.value })} placeholder="Rechercher par titre..." className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Localisation</label>
+                                <input value={filters.localisation} onChange={(e) => setFilters({ ...filters, localisation: e.target.value })} placeholder="Ville ou quartier..." className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                                <select value={filters.typeProjet} onChange={(e) => setFilters({ ...filters, typeProjet: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                    <option value="">Tous</option>
+                                    <option value="construction">Construction</option>
+                                    <option value="rénovation">Rénovation</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Statut</label>
+                                <select value={filters.statut} onChange={(e) => setFilters({ ...filters, statut: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                                    <option value="">Tous</option>
+                                    <option value="en_cours">En financement</option>
+                                    <option value="financé">Financé</option>
+                                    <option value="terminé">Terminé</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Montant min (€)</label>
+                                <input type="number" value={filters.minMontant} onChange={(e) => setFilters({ ...filters, minMontant: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Montant max (€)</label>
+                                <input type="number" value={filters.maxMontant} onChange={(e) => setFilters({ ...filters, maxMontant: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                            </div>
+                        </div>
+
+                        <div className="mt-4 flex items-center gap-3 justify-end">
+                            <button onClick={resetFilters} className="px-4 py-2 border rounded">Réinitialiser</button>
+                            <div className="text-sm text-slate-600">{filteredProjects.length} projet(s) correspondant(s)</div>
+                        </div>
+                    </div>
+
                     {projects.length === 0 ? (
                         <div className="bg-white rounded-lg shadow p-12 text-center">
                             <Building2 className="mx-auto text-slate-400 mb-4" size={48} />
@@ -96,8 +174,15 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
                             <p className="text-slate-600">Les nouveaux projets apparaîtront ici</p>
                         </div>
                     ) : (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {projects.map((project) => {
+                        filteredProjects.length === 0 ? (
+                            <div className="bg-white rounded-lg shadow p-12 text-center">
+                                <Building2 className="mx-auto text-slate-400 mb-4" size={48} />
+                                <h3 className="text-xl font-semibold text-slate-900 mb-2">Aucun projet trouvé</h3>
+                                <p className="text-slate-600">Essayez d'élargir vos critères de filtrage</p>
+                            </div>
+                        ) : (
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {filteredProjects.map((project) => {
                                 const progress = getProgressPercentage(project);
                                 const statusBadge = getStatusBadge(project.statut || (project as any).status || 'en_cours');
 
@@ -180,7 +265,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
                                 );
                             })}
                         </div>
-                    )}
+                    ))}
                     {/* Create project modal (promoteur) */}
                     {showCreateModal && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">

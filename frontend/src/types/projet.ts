@@ -23,4 +23,4 @@ export interface Projet {
   [key: string]: any;
 }
 
-// Projet is exported via the 'export interface Projet' declaration above
+
