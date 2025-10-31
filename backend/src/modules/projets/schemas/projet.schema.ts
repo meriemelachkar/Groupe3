@@ -26,6 +26,12 @@ export class Projet extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   promoteurId: string;
+
+  @Prop({ type: Number, required: true, min: 0, max: 100 })
+  rendement: number; // Rendement attendu en pourcentage
+
+  @Prop({ type: Number, required: true, min: 1 })
+  duree: number; // Durée du projet en mois
 }
 
 export const ProjetSchema = SchemaFactory.createForClass(Projet);

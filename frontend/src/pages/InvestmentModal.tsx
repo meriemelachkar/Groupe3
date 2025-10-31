@@ -16,7 +16,7 @@ const InvestmentModal: React.FC<InvestmentModalProps> = ({ project, onClose, onS
   // api instance injects the token; no client-side user checks required here
 
   const calculateReturn = () => {
-    return (amount * (project.expected_return ?? 0)) / 100;
+    return (amount * (project.rendement ?? 0)) / 100;
   };
 
   const calculateTotal = () => {
@@ -97,12 +97,12 @@ const InvestmentModal: React.FC<InvestmentModalProps> = ({ project, onClose, onS
               <span className="font-semibold text-slate-900">{amount.toLocaleString('fr-FR')} €</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Rendement estimé ({project.expected_return ?? 0}%)</span>
+              <span className="text-slate-600">Rendement estimé ({project.rendement ?? 0}%)</span>
               <span className="font-semibold text-emerald-600">+{calculateReturn().toLocaleString('fr-FR')} €</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">Durée</span>
-              <span className="font-semibold text-slate-900">{project.duration_months ?? '—'} mois</span>
+              <span className="font-semibold text-slate-900">{project.duree ?? '—'} mois</span>
             </div>
             <div className="border-t border-slate-200 pt-2 mt-2">
               <div className="flex justify-between">

@@ -131,7 +131,7 @@ const ProjectDetailsPage: React.FC = () => {
                     <Calendar size={20} className="text-emerald-600" />
                     <span className="text-sm text-slate-600">Durée</span>
                   </div>
-                  <div className="text-2xl font-bold text-slate-900">{(project.duration_months ?? (project as any).duration_months) || '—'} mois</div>
+                  <div className="text-2xl font-bold text-slate-900">{(project.duree ?? (project as any).duree) || '—'} mois</div>
                 </div>
               </div>
 

@@ -6,6 +6,8 @@ export interface Projet {
   typeProjet: 'construction' | 'rénovation';
   montantTotal: number;
   promoteurId: string;
+  rendement: number;
+  duree: number;
 
   // optional according to backend schema
   description?: string;
@@ -18,7 +20,6 @@ export interface Projet {
   // UI extras (not enforced by backend schema) — keep optional so frontend can use them
   images?: string[];
   expected_return?: number;
-  duration_months?: number;
   min_investment?: number;
   [key: string]: any;
 }

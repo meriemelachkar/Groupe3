@@ -529,7 +529,7 @@ export const Dashboard: React.FC = () => {
                                                     <div>
                                                         <div className="text-sm text-slate-600">Durée</div>
                                                         <div className="font-semibold text-slate-900">
-                                                            {(project.duration_months ?? project.duration ?? project.duree ?? '—')} mois
+                                                            {(project.duree ?? project.duration ?? project.duree ?? '—')} mois
                                                         </div>
                                                     </div>
                                                 </div>

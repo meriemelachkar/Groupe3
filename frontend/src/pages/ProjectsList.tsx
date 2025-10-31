@@ -31,6 +31,8 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
         typeProjet: 'construction',
         montantTotal: 0,
         localisation: '',
+        rendement: 0,
+        duree: 12,
     });
 
     useEffect(() => {
@@ -252,7 +254,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
                                                     <Calendar size={16} className="text-emerald-600" />
                                                     <div>
                                                         <div className="text-xs text-slate-600">Durée</div>
-                                                        <div className="font-semibold text-slate-900">{(project.duration_months ?? (project as any).duration_months ?? '—')} mois</div>
+                                                        <div className="font-semibold text-slate-900">{(project.duree ?? (project as any).duree ?? '—')} mois</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -295,6 +297,14 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
                                         <label className="block text-sm text-slate-600 mb-1">Localisation</label>
                                         <input value={newProject.localisation || ''} onChange={(e) => setNewProject({ ...newProject, localisation: e.target.value })} className="w-full border px-3 py-2 rounded" />
                                     </div>
+                                    <div>
+                                        <label className="block text-sm text-slate-600 mb-1">Rendement attendu (%)</label>
+                                        <input type="number" min="0" max="100" value={newProject.rendement ?? 0} onChange={(e) => setNewProject({ ...newProject, rendement: Number(e.target.value) })} className="w-full border px-3 py-2 rounded" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-slate-600 mb-1">Durée (mois)</label>
+                                        <input type="number" min="1" value={newProject.duree ?? 12} onChange={(e) => setNewProject({ ...newProject, duree: Number(e.target.value) })} className="w-full border px-3 py-2 rounded" />
+                                    </div>
                                     <div className="md:col-span-2">
                                         <label className="block text-sm text-slate-600 mb-1">Description</label>
                                         <textarea value={newProject.description || ''} onChange={(e) => setNewProject({ ...newProject, description: e.target.value })} className="w-full border px-3 py-2 rounded h-28" />
@@ -305,18 +315,29 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
                                     <button onClick={() => setShowCreateModal(false)} className="px-4 py-2 border rounded">Annuler</button>
                                     <button disabled={creating} onClick={async () => {
                                         // minimal client validation respecting backend CreateProjetDto
-                                        if (!newProject.titre || !newProject.typeProjet || !newProject.montantTotal || !newProject.localisation) {
-                                            alert('Veuillez remplir les champs obligatoires : titre, type, montant total, localisation');
+                                        if (!newProject.titre || !newProject.typeProjet || !newProject.montantTotal || !newProject.localisation || newProject.rendement === undefined || !newProject.duree) {
+                                            alert('Veuillez remplir tous les champs obligatoires (titre, type, montant, localisation, rendement, durée)');
+                                            return;
+                                        }
+                                        if (newProject.rendement < 0 || newProject.rendement > 100) {
+                                            alert('Le rendement doit être compris entre 0 et 100%');
+                                            return;
+                                        }
+                                        if (newProject.duree < 1) {
+                                            alert('La durée doit être d\'au moins 1 mois');
                                             return;
                                         }
                                         try {
                                             setCreating(true);
+                                            // Convert numeric fields explicitly to ensure they are numbers
                                             const payload = {
-                                                titre: newProject.titre,
-                                                description: newProject.description || '',
+                                                titre: String(newProject.titre || '').trim(),
+                                                description: String(newProject.description || '').trim(),
                                                 typeProjet: newProject.typeProjet,
-                                                montantTotal: Number(newProject.montantTotal),
-                                                localisation: newProject.localisation,
+                                                montantTotal: Number(newProject.montantTotal || 0),
+                                                localisation: String(newProject.localisation || '').trim(),
+                                                rendement: Number(newProject.rendement || 0),
+                                                duree: Number(newProject.duree || 12),
                                             };
                                             await api.post('/projets', payload);
                                             setShowCreateModal(false);
