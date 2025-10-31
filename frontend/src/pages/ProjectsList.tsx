@@ -52,8 +52,9 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
     };
 
     const getProgressPercentage = (project: Projet) => {
-        const raised = project.montantCollecte || 0;
-        const target = project.montantTotal || 1;
+        // Utilise la même logique de fallback que dans l'affichage
+        const raised = Number(project.montantCollecte ?? project.raised_amount ?? project.raised ?? 0);
+        const target = Number(project.montantTotal ?? project.target_amount ?? project.target ?? 1);
         return Math.min((raised / target) * 100, 100);
     };
 

@@ -136,13 +136,13 @@ export const Dashboard: React.FC = () => {
     };
 
     const calculateTotalInvested = () => {
-        return investments.reduce((sum, inv) => sum + (inv?.amount ?? 0), 0);
+        return investments.reduce((sum, inv) => sum + (inv?.montantInvesti ?? 0), 0);
     };
 
     const calculateExpectedReturns = () => {
         return investments.reduce((sum, inv) => {
-            const amt = toNum(inv?.amount);
-            const rate = toNum(inv?.project?.expected_return);
+            const amt = toNum(inv?.montantInvesti);
+            const rate = toNum(inv?.rendementInvestissement);
             if (amt && rate) return sum + (amt * rate) / 100;
             return sum;
         }, 0);
@@ -202,7 +202,9 @@ export const Dashboard: React.FC = () => {
                                         </div>
                                         <div className="text-sm text-slate-600">Projets</div>
                                     </div>
-                                    <div className="text-3xl font-bold text-slate-900">{investments.length}</div>
+                                    <div className="text-3xl font-bold text-slate-900">
+                                        {new Set(investments.map(inv => inv.projetId?._id)).size}
+                                    </div>
                                 </div>
                             </div>
 
@@ -239,28 +241,40 @@ export const Dashboard: React.FC = () => {
                                                 <tr key={investment._id || investment.id} className="hover:bg-slate-50">
                                                     <td className="px-6 py-4">
                                                         <div className="font-medium text-slate-900">
-                                                            {investment.project?.title || 'N/A'}
+                                                            {investment.projetId?.titre || 'N/A'}
                                                         </div>
                                                         <div className="text-sm text-slate-600">
-                                                            {investment.project?.location || ''}
+                                                            Durée : {investment.dureeInvestissement} mois
+                                                            <br />
+                                                            Fin prévue : {new Date(investment.dateFinPrevue).toLocaleDateString('fr-FR')}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 font-semibold text-slate-900">
-                                                        {(investment.amount ?? 0).toLocaleString('fr-FR')} €
+                                                        {(investment.montantInvesti ?? 0).toLocaleString('fr-FR')} €
                                                     </td>
                                                     <td className="px-6 py-4 text-emerald-600">
-                                                        {investment.project?.expected_return || 0}%
+                                                        {investment.rendementInvestissement || 0}%
                                                     </td>
                                                     <td className="px-6 py-4 font-semibold text-emerald-600">
-                                                            +{((toNum(investment.amount) * toNum(investment.project?.expected_return)) / 100).toLocaleString('fr-FR')} €
+                                                            +{((toNum(investment.montantInvesti) * toNum(investment.rendementInvestissement)) / 100).toLocaleString('fr-FR')} €
                                                     </td>
                                                     <td className="px-6 py-4 text-slate-600">
-                                                        {new Date(investment.investment_date).toLocaleDateString('fr-FR')}
+                                                        {new Date(investment.dateInvestissement).toLocaleDateString('fr-FR')}
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        <span className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs font-medium rounded">
-                                                            {investment.status}
+                                                        <span className={`px-2 py-1 text-xs font-medium rounded ${
+                                                            investment.statut === 'termine' 
+                                                                ? 'bg-slate-100 text-slate-800'
+                                                                : 'bg-emerald-100 text-emerald-800'
+                                                        }`}>
+                                                            {investment.statut === 'termine' ? 'Terminé' : 'En cours'}
                                                         </span>
+                                                        {investment.statut === 'termine' && (
+                                                            <div className="mt-2 text-sm">
+                                                                <span className="text-slate-600">Rendement réel :</span>
+                                                                <span className="ml-2 font-semibold text-emerald-600">{investment.rendementReel}%</span>
+                                                            </div>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}

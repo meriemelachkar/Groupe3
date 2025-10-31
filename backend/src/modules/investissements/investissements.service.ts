@@ -19,14 +19,21 @@ export class InvestissementsService {
     if (projet.statut !== 'en_cours')
       throw new BadRequestException('Impossible d’investir sur un projet terminé ou financé');
 
-    // Simule un rendement de 10 % par défaut
-    const rendementAttendu = dto.montantInvesti * 0.1;
+    // Calcule la date de fin prévue basée sur la durée du projet
+    const dateInvestissement = new Date();
+    const dateFinPrevue = new Date(dateInvestissement);
+    dateFinPrevue.setMonth(dateFinPrevue.getMonth() + projet.duree);
 
-    // Enregistre l’investissement
+    // Crée l'investissement avec toutes les informations nécessaires
     const investissement = new this.investissementModel({
       ...dto,
       investisseurId,
-      rendementAttendu,
+      promoteurId: projet.promoteurId,
+      dateInvestissement,
+      rendementInvestissement: projet.rendement,
+      dureeInvestissement: projet.duree,
+      dateFinPrevue,
+      statut: 'en_cours'
     });
     await investissement.save();
 
