@@ -66,7 +66,7 @@ export default function Navbar({ currentPage = "" }: NavbarProps) {
                                     <span className="text-sm">{profile.prenom} {profile.nom}</span>
                                     <span className="text-xs bg-emerald-600 px-2 py-1 rounded">{profile.role}</span>
                                 </div>
-                               
+
                                 <button
                                     onClick={() => onNavigate('dashboard')}
                                     className="p-2 hover:bg-slate-800 rounded transition"
@@ -75,12 +75,16 @@ export default function Navbar({ currentPage = "" }: NavbarProps) {
                                     <LayoutDashboard size={20} />
                                 </button>
                                 <button
-                                    onClick={signOut}
+                                    onClick={() => {
+                                        signOut();
+                                        onNavigate("");
+                                    }}
                                     className="p-2 hover:bg-slate-800 rounded transition"
                                     title="Déconnexion"
                                 >
                                     <LogOut size={20} />
                                 </button>
+
                             </>
                         ) : (
                             <>

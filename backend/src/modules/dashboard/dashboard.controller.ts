@@ -21,4 +21,18 @@ export class DashboardController {
         const promoteurId = req.user.userId;
         return this.dashboardService.getBienDetails(bienId, promoteurId);
     }
+
+    @Get('promoteur/projets/stats')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    async getProjetsDashboard(@Req() req) {
+        const promoteurId = req.user.userId;
+        return this.dashboardService.getPromoteurProjetsDashboard(promoteurId);
+    }
+
+    @Get('promoteur/projet/:projetId')
+    @UseGuards(JwtAuthGuard)
+    async getProjetDetails(@Param('projetId') projetId: string, @Req() req) {
+        const promoteurId = req.user.userId;
+        return this.dashboardService.getProjetDetails(projetId, promoteurId);
+    }
 }

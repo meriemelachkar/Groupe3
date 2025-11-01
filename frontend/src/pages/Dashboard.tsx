@@ -6,6 +6,7 @@ import { cancelReservation } from '../api/reservationsApi';
 import { useAuth } from '../context/AuthContext';
 import NavBar from "../components/Navbar";
 import PropertyReservations from '../components/PropertyReservations';
+import { ProjectDashboard } from '../components/ProjectDashboard';
 
 export const Dashboard: React.FC = () => {
     const { profile, user } = useAuth();
@@ -440,125 +441,7 @@ export const Dashboard: React.FC = () => {
 
                     {profile?.role === 'promoteur' && (
                         <>
-                            <div className="grid md:grid-cols-3 gap-6 mb-8">
-                                <div className="bg-white rounded-lg shadow p-6">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="bg-emerald-100 p-2 rounded">
-                                            <Building2 className="text-emerald-600" size={24} />
-                                        </div>
-                                        <div className="text-sm text-slate-600">Projets</div>
-                                    </div>
-                                    <div className="text-3xl font-bold text-slate-900">{projects.length}</div>
-                                </div>
-
-                                <div className="bg-white rounded-lg shadow p-6">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="bg-emerald-100 p-2 rounded">
-                                            <Target className="text-emerald-600" size={24} />
-                                        </div>
-                                        <div className="text-sm text-slate-600">Objectif Total</div>
-                                    </div>
-                                    <div className="text-3xl font-bold text-slate-900">
-                                        {projects
-                                            .reduce((sum, p) => sum + p.target_amount, 0)
-                                            .toLocaleString('fr-FR')}{' '}
-                                        €
-                                    </div>
-                                </div>
-
-                                <div className="bg-white rounded-lg shadow p-6">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="bg-emerald-100 p-2 rounded">
-                                            <DollarSign className="text-emerald-600" size={24} />
-                                        </div>
-                                        <div className="text-sm text-slate-600">Fonds Levés</div>
-                                    </div>
-                                    <div className="text-3xl font-bold text-emerald-600">
-                                        {projects
-                                            .reduce((sum, p) => sum + p.raised_amount, 0)
-                                            .toLocaleString('fr-FR')}{' '}
-                                        €
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-lg shadow overflow-hidden">
-                                <div className="p-6 border-b border-slate-200">
-                                    <h2 className="text-xl font-bold text-slate-900">Mes Projets</h2>
-                                </div>
-                                <div className="divide-y divide-slate-200">
-                                    {projects.map((project) => {
-                                        const raised = toNum(project.raised_amount ?? project.montantCollecte ?? project.raised);
-                                        const target = toNum(project.target_amount ?? project.montantTotal ?? project.target);
-                                        const progress = target === 0 ? 0 : Math.min((raised / target) * 100, 100);
-                                        return (
-                                            <div key={project._id || project.id} className="p-6 hover:bg-slate-50">
-                                                <div className="flex justify-between items-start mb-4">
-                                                    <div>
-                                                        <h3 className="font-semibold text-slate-900 text-lg">{project.title}</h3>
-                                                        <p className="text-slate-600">{project.location}</p>
-                                                    </div>
-                                                    {(() => {
-                                                        const badge = getProjectStatusBadge(project.statut || (project as any).status || 'en_cours');
-                                                        return (
-                                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${badge.cls}`}>
-                                                                    {badge.label}
-                                                                </span>
-                                                        );
-                                                    })()}
-                                                </div>
-                                                <div className="mb-4">
-                                                    <div className="flex justify-between text-sm mb-1">
-                                                        <span className="text-slate-600">Progression</span>
-                                                        <span className="font-semibold text-emerald-600">
-                                                            {progress.toFixed(1)}%
-                                                        </span>
-                                                    </div>
-                                                    <div className="w-full bg-slate-200 rounded-full h-2">
-                                                        <div
-                                                            className="bg-emerald-600 h-2 rounded-full transition-all"
-                                                            style={{ width: `${progress}%` }}
-                                                        ></div>
-                                                    </div>
-                                                </div>
-                                                <div className="grid md:grid-cols-4 gap-4">
-                                                    <div>
-                                                        <div className="text-sm text-slate-600">Objectif</div>
-                                                        <div className="font-semibold text-slate-900">
-                                                            {(toNum(project.target_amount ?? project.montantTotal ?? project.target)).toLocaleString('fr-FR')} €
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-sm text-slate-600">Collecté</div>
-                                                        <div className="font-semibold text-emerald-600">
-                                                            {(toNum(project.raised_amount ?? project.montantCollecte ?? project.raised)).toLocaleString('fr-FR')} €
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-sm text-slate-600">Rendement</div>
-                                                        <div className="font-semibold text-slate-900">
-                                                            {(project.expected_return ?? project.rendement ?? '—')}%
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-sm text-slate-600">Durée</div>
-                                                        <div className="font-semibold text-slate-900">
-                                                            {(project.duree ?? project.duration ?? project.duree ?? '—')} mois
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                    {projects.length === 0 && (
-                                        <div className="p-12 text-center">
-                                            <Building2 className="mx-auto text-slate-400 mb-4" size={48} />
-                                            <h3 className="text-lg font-semibold text-slate-900 mb-2">Aucun projet</h3>
-                                            <p className="text-slate-600">Créez votre premier projet</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                            <ProjectDashboard />
 
                             {/* Mes Biens (pour promoteur) */}
                             <div className="grid md:grid-cols-3 gap-6 my-8">
