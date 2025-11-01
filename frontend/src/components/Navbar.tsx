@@ -61,11 +61,14 @@ export default function Navbar({ currentPage = "" }: NavbarProps) {
                     <div className="flex items-center gap-4">
                         {user && profile ? (
                             <>
-                                <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => onNavigate('profile')}
+                                    className="flex items-center gap-2 hover:text-emerald-400 transition"
+                                >
                                     <User size={18} />
                                     <span className="text-sm">{profile.prenom} {profile.nom}</span>
                                     <span className="text-xs bg-emerald-600 px-2 py-1 rounded">{profile.role}</span>
-                                </div>
+                                </button>
 
                                 <button
                                     onClick={() => onNavigate('dashboard')}

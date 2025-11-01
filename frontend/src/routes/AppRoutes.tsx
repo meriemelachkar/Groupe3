@@ -8,6 +8,7 @@ import PropertiesList from "../pages/PropertiesList";
 import ProjectDetailsPage from "../pages/ProjectDetails";
 import { PropertyDetailsPage } from "../pages/PropertyDetails";
 import { Messages } from "../pages/Messages";
+import { Profile } from "../pages/Profile";
 
 export default function AppRoutes() {
   return (
@@ -22,6 +23,7 @@ export default function AppRoutes() {
         <Route path="/properties" element={<PropertiesList />} />
         <Route path="/properties/:id" element={<PropertyDetailsPage />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

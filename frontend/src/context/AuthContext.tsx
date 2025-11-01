@@ -3,11 +3,15 @@ import { registerUser, loginUser } from '../api/authApi';
 
 
 export interface Profile {
-    id: string; // L'ID utilisateur
+    id: string;
     prenom: string;
     nom: string;
     email: string;
     role: string;
+    telephone?: string;
+    adresse?: string;
+    nombreInvestissements?: number;
+    montantTotalInvesti?: number;
 }
 
 interface AuthContextType {
@@ -73,12 +77,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const data = await res.json();
 
             const profileData: Profile = {
-                // 💡 ASSUREZ-VOUS QUE data._id EST DE TYPE string
-                id: data._id as string, 
+                id: data._id as string,
                 prenom: data.prenom as string,
                 nom: data.nom as string,
                 email: data.email as string,
                 role: data.role as string,
+                telephone: data.telephone,
+                adresse: data.adresse,
+                nombreInvestissements: data.nombreInvestissements,
+                montantTotalInvesti: data.montantTotalInvesti,
             };
 
             setProfile(profileData);
