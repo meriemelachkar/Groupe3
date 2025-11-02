@@ -8,6 +8,7 @@ export interface Profile {
     nom: string;
     email: string;
     role: string;
+    photoUrl?: string;
     telephone?: string;
     adresse?: string;
     nombreInvestissements?: number;
@@ -27,6 +28,7 @@ interface AuthContextType {
     }) => Promise<void>;
     signIn: (data: { email: string; motDePasse: string }) => Promise<string>;
     signOut: () => void;
+    updateProfilePicture: (file: File) => Promise<void>;
 }
 // ---------------------------------------------------
 
@@ -82,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 nom: data.nom as string,
                 email: data.email as string,
                 role: data.role as string,
+                photoUrl: data.photoUrl,
                 telephone: data.telephone,
                 adresse: data.adresse,
                 nombreInvestissements: data.nombreInvestissements,
@@ -153,8 +156,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('profile');
     };
 
+    const updateProfilePicture = async (file: File) => {
+        if (!user?.userId || !user?.token) return;
+        
+        const formData = new FormData();
+        formData.append('photo', file);
+
+        try {
+            const response = await fetch(`http://localhost:3000/users/${user.userId}/photo`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                },
+                body: formData,
+            });
+
+            if (!response.ok) throw new Error('Failed to update profile picture');
+
+            const updatedUser = await response.json();
+            if (profile) {
+                const updatedProfile = { ...profile, photoUrl: updatedUser.photoUrl };
+                setProfile(updatedProfile);
+                localStorage.setItem('profile', JSON.stringify(updatedProfile));
+            }
+        } catch (error) {
+            console.error('Error updating profile picture:', error);
+            throw error;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut }}>
+        <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, updateProfilePicture }}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,4 +1,5 @@
-import { Controller, Get, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -25,5 +26,19 @@ export class UsersController {
       return { message: 'Accès non autorisé à ce profil' };
     }
     return this.usersService.findById(id);
+  }
+
+  @Post(':id/photo')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('photo'))
+  async uploadProfilePicture(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+  ) {
+    if (req.user.userId !== id) {
+      return { message: 'Vous ne pouvez pas modifier la photo d\'un autre utilisateur' };
+    }
+    return this.usersService.updateProfilePicture(id, file);
   }
 }

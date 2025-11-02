@@ -21,8 +21,16 @@ export const Profile: React.FC = () => {
                 <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                     <div className="bg-slate-900 text-white p-8">
                         <div className="flex items-center gap-4">
-                            <div className="bg-emerald-600 p-4 rounded-full">
-                                <User size={32} />
+                            <div className="w-20 h-20 rounded-full overflow-hidden bg-emerald-600 flex items-center justify-center">
+                                {profile.photoUrl ? (
+                                    <img
+                                        src={profile.photoUrl}
+                                        alt={`${profile.prenom} ${profile.nom}`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <User size={32} className="text-white" />
+                                )}
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold">{profile.prenom} {profile.nom}</h1>
