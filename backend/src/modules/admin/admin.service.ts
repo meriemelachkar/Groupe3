@@ -9,7 +9,6 @@ import { Message } from '../messages/schemas/message.schema';
 
 @Injectable()
 export class AdminService {
-  getAdminStats: any;
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Projet.name) private readonly projetModel: Model<Projet>,

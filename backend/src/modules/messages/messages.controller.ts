@@ -11,8 +11,6 @@ import { Roles } from '../../common/decorators/roles.decorator';
 @Controller('messages')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class MessagesController {
-  [x: string]: any;
-  findAll: any;
   constructor(private readonly messagesService: MessagesService) {}
 
   // 📨 Envoyer un message
