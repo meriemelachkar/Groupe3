@@ -22,6 +22,7 @@ export interface Bien {
   statut: string;
   projetAssocieId?: string;
   proprietaireId?: Proprietaire | string;
+  imageUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -47,6 +48,8 @@ const PropertiesList: React.FC = () => {
     statut: 'disponible',
     projetAssocieId: '',
   });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -225,8 +228,18 @@ const PropertiesList: React.FC = () => {
                     onClick={() => navigate(`/properties/${property._id}`)}
                     className="bg-white rounded-lg shadow hover:shadow-xl transition cursor-pointer overflow-hidden"
                   >
-                    <div className="h-48 bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center relative">
-                      <Home className="text-white" size={64} />
+                    <div className="h-48 relative">
+                      {property.imageUrl ? (
+                        <img 
+                          src={property.imageUrl} 
+                          alt={property.titre}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
+                          <Home className="text-white" size={64} />
+                        </div>
+                      )}
                       <div className="absolute top-3 right-3">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusBadge.class}`}>
                           {statusBadge.label}
@@ -298,6 +311,38 @@ const PropertiesList: React.FC = () => {
                     <option value="vendu">Vendu</option>
                   </select>
                   <textarea className="border p-2 rounded" placeholder="Description" value={newBien.description || ''} onChange={(e) => setNewBien({ ...newBien, description: e.target.value })} />
+                  
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-slate-700">Image du bien</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setSelectedImage(file);
+                          // Créer une URL pour la prévisualisation
+                          const url = URL.createObjectURL(file);
+                          setPreviewUrl(url);
+                        }
+                      }}
+                      className="block w-full text-sm text-slate-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-emerald-50 file:text-emerald-700
+                        hover:file:bg-emerald-100"
+                    />
+                    {previewUrl && (
+                      <div className="mt-2">
+                        <img
+                          src={previewUrl}
+                          alt="Prévisualisation"
+                          className="h-32 w-auto object-cover rounded"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-4 flex justify-end gap-2">
@@ -330,9 +375,11 @@ const PropertiesList: React.FC = () => {
                           if (v !== undefined && v !== '') payload[k] = v;
                         });
 
-                        await createBien(payload);
+                        await createBien(payload, selectedImage || undefined);
                         setShowAddModal(false);
                         setNewBien({ titre: '', description: '', prix: 0, adresse: '', typeBien: '', statut: 'disponible', projetAssocieId: '' });
+                        setSelectedImage(null);
+                        setPreviewUrl(null);
                         loadProperties();
                       } catch (err: any) {
                         console.error('Erreur création bien:', err);

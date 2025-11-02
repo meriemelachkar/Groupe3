@@ -1,6 +1,8 @@
 import {
-  Controller, Get, Post, Patch, Delete, Param, Body, Request, UseGuards
+  Controller, Get, Post, Patch, Delete, Param, Body, 
+  Request, UseGuards, UseInterceptors, UploadedFile
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { BiensService } from './biens.service';
 import { CreateBienDto } from './dto/create-bien.dto';
 import { UpdateBienDto } from './dto/update-bien.dto';
@@ -30,6 +32,18 @@ export class BiensController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.biensService.findById(id);
+  }
+
+  // Upload d'image pour un bien
+  @Post('upload')
+  @Roles('promoteur', 'admin')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new Error('Aucun fichier fourni');
+    }
+    const url = await this.biensService.uploadImage(file);
+    return { url };
   }
 
   // Créer un bien (promoteur uniquement)

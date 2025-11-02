@@ -25,6 +25,7 @@ export interface Bien {
     statut: string;
     projetAssocieId?: string;
     proprietaireId?: Proprietaire | string;
+    imageUrl?: string;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -62,8 +63,18 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({ property, onBa
                     </button>
 
                     <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
-                        <div className="h-64 bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
-                            <Home className="text-white" size={72} />
+                        <div className="h-64 relative">
+                            {property.imageUrl ? (
+                                <img 
+                                    src={property.imageUrl} 
+                                    alt={property.titre}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="h-full w-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
+                                    <Home className="text-white" size={72} />
+                                </div>
+                            )}
                         </div>
 
                         <div className="p-6">

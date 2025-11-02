@@ -99,16 +99,7 @@ export default function SignUp() {
             Créez votre compte BuildWealth
           </p>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-              {success}
-            </div>
-          )}
+          
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
@@ -257,6 +248,17 @@ export default function SignUp() {
               {loading ? "Création du compte..." : "Créer mon compte"}
             </button>
           </form>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded m-4">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded m-4">
+              {success}
+            </div>
+          )}
 
           <div className="mt-6 text-center">
             <p className="text-slate-600">

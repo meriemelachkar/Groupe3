@@ -26,6 +26,9 @@ export class BienImmobilier extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   proprietaireId: string;
+
+  @Prop()
+  imageUrl?: string;
 }
 
 export const BienImmobilierSchema = SchemaFactory.createForClass(BienImmobilier);

@@ -9,6 +9,7 @@ export interface Bien {
   typeBien: string;
   statut: string;
   projetAssocieId: string;
+  imageUrl?: string;
 }
 
 /**
@@ -30,8 +31,35 @@ export const fetchBienById = async (id: string): Promise<Bien> => {
   return res.data;
 };
 
-export const createBien = async (data: Partial<Bien>): Promise<Bien> => {
-  const res = await api.post('/biens', data);
+export const uploadImage = async (image: File) => {
+  console.log('Uploading image:', image);
+  const formData = new FormData();
+  formData.append('image', image);
+  const res = await api.post('/biens/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  console.log('Upload response:', res.data);
+  return res.data;
+};
+
+export const createBien = async (data: Partial<Bien>, image?: File): Promise<Bien> => {
+  let imageUrl;
+  if (image) {
+    console.log('Starting image upload process');
+    const uploadResult = await uploadImage(image);
+    imageUrl = uploadResult.url;
+    console.log('Image uploaded, URL:', imageUrl);
+  }
+  
+  const payload = {
+    ...data,
+    ...(imageUrl && { imageUrl }),
+  };
+  
+  console.log('Creating bien with payload:', payload);
+  const res = await api.post('/biens', payload);
   return res.data;
 };
 

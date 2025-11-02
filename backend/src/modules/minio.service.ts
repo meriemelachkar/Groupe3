@@ -10,6 +10,7 @@ export class MinioService {
   private readonly bucketNames = {
     projets: 'projets',
     avatars: 'avatars',
+    biens: 'biens',
   };
 
   constructor() {
@@ -94,6 +95,13 @@ export class MinioService {
    */
   async uploadProjectFile(file: Express.Multer.File): Promise<string> {
     return this.uploadFile(file, 'projets');
+  }
+
+  /**
+   * Upload une image de bien immobilier
+   */
+  async uploadBienImage(file: Express.Multer.File): Promise<string> {
+    return this.uploadFile(file, 'biens');
   }
 
   /**

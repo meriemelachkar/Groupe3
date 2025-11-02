@@ -19,4 +19,8 @@ export class CreateBienDto {
   @IsOptional()
   @IsString()
   projetAssocieId?: string;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }
