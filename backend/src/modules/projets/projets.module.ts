@@ -3,10 +3,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ProjetsService } from './projets.service';
 import { ProjetsController } from './projets.controller';
 import { Projet, ProjetSchema } from './schemas/projet.schema';
+import { MinioService } from '../minio.service';
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: Projet.name, schema: ProjetSchema }])],
   controllers: [ProjetsController],
-  providers: [ProjetsService],
+  providers: [ProjetsService, MinioService],
 })
 export class ProjetsModule {}

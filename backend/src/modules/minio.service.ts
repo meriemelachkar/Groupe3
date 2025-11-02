@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Client } from 'minio';
 
 @Injectable()
 export class MinioService {
+  private readonly logger = new Logger(MinioService.name);
   private readonly minioClient: Client;
+
+  // Buckets utilisés
   private readonly bucketNames = {
     projets: 'projets',
-    profiles: 'avatars', 
+    avatars: 'avatars',
   };
 
   constructor() {
@@ -23,18 +26,21 @@ export class MinioService {
    * Vérifie si le bucket existe, sinon le crée et le rend public
    */
   private async ensureBucketExists(bucketName: string) {
-    const exists = await this.minioClient.bucketExists(bucketName);
-    if (!exists) {
-      await this.minioClient.makeBucket(bucketName, 'us-east-1');
-      console.log(`Bucket "${bucketName}" créé`);
-
-      // Appliquer la policy publique
-      await this.makeBucketPublic(bucketName);
+    try {
+      const exists = await this.minioClient.bucketExists(bucketName);
+      if (!exists) {
+        await this.minioClient.makeBucket(bucketName, 'us-east-1');
+        this.logger.log(`Bucket "${bucketName}" créé`);
+        await this.makeBucketPublic(bucketName);
+      }
+    } catch (error) {
+      this.logger.error(`Erreur lors de la vérification/création du bucket "${bucketName}":`, error);
+      throw error;
     }
   }
 
   /**
-   * Applique une policy publique pour permettre l'accès en lecture à tous
+   * Rendre un bucket public (lecture ouverte à tous)
    */
   private async makeBucketPublic(bucketName: string) {
     const publicPolicy = {
@@ -48,24 +54,38 @@ export class MinioService {
         },
       ],
     };
-    await this.minioClient.setBucketPolicy(bucketName, JSON.stringify(publicPolicy));
-    console.log(`Bucket "${bucketName}" rendu public`);
+
+    try {
+      await this.minioClient.setBucketPolicy(bucketName, JSON.stringify(publicPolicy));
+      this.logger.log(`Bucket "${bucketName}" rendu public`);
+    } catch (error) {
+      this.logger.error(`Erreur lors de l'application de la policy publique pour "${bucketName}":`, error);
+      throw error;
+    }
   }
 
   /**
    * Upload un fichier dans le bucket spécifié
    */
-  async uploadFile(file: Express.Multer.File, bucketName: 'projets' | 'avatars'): Promise<string> {
+  async uploadFile(file: Express.Multer.File, bucket: keyof typeof this.bucketNames): Promise<string> {
+    const bucketName = this.bucketNames[bucket];
     await this.ensureBucketExists(bucketName);
+
     const fileName = `${Date.now()}-${file.originalname}`;
-    await this.minioClient.putObject(bucketName, fileName, file.buffer);
-    return `http://localhost:9000/${bucketName}/${fileName}`;
+    try {
+      await this.minioClient.putObject(bucketName, fileName, file.buffer);
+      this.logger.log(`Fichier "${fileName}" uploadé dans "${bucketName}"`);
+      return `http://localhost:9000/${bucketName}/${fileName}`;
+    } catch (error) {
+      this.logger.error(`Erreur upload fichier "${fileName}" vers "${bucketName}":`, error);
+      throw error;
+    }
   }
 
   /**
-   * Upload une photo de profil
+   * Upload une photo de profil (avatars)
    */
-  async uploadProfilePicture(file: Express.Multer.File): Promise<string> {
+  async uploadAvatar(file: Express.Multer.File): Promise<string> {
     return this.uploadFile(file, 'avatars');
   }
 
@@ -79,7 +99,14 @@ export class MinioService {
   /**
    * Supprime un fichier d'un bucket
    */
-  async deleteFile(bucketName: 'projets' | 'avatars', fileName: string) {
-    await this.minioClient.removeObject(bucketName, fileName);
+  async deleteFile(bucket: keyof typeof this.bucketNames, fileName: string) {
+    const bucketName = this.bucketNames[bucket];
+    try {
+      await this.minioClient.removeObject(bucketName, fileName);
+      this.logger.log(`Fichier "${fileName}" supprimé de "${bucketName}"`);
+    } catch (error) {
+      this.logger.error(`Erreur suppression fichier "${fileName}" de "${bucketName}":`, error);
+      throw error;
+    }
   }
 }

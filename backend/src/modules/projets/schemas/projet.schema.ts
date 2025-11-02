@@ -32,6 +32,9 @@ export class Projet extends Document {
 
   @Prop({ type: Number, required: true, min: 1 })
   duree: number; // Durée du projet en mois
+
+  @Prop()
+  imageUrl?: string; // URL de l'image du projet
 }
 
 export const ProjetSchema = SchemaFactory.createForClass(Projet);

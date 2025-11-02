@@ -1,7 +1,8 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, UseGuards, Request
+  Param, Body, UseGuards, Request, UseInterceptors, UploadedFile
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ProjetsService } from './projets.service';
 import { CreateProjetDto } from './dto/create-projet.dto';
 import { UpdateProjetDto } from './dto/update-projet.dto';
@@ -34,15 +35,33 @@ export class ProjetsController {
 
   @Post()
   @Roles('promoteur')
-  async create(@Body() dto: CreateProjetDto, @Request() req) {
-    const promoteurId = req.user.userId; // récupéré depuis le token JWT
-    return this.projetsService.create(dto, promoteurId);
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @Body() dto: CreateProjetDto,
+    @Request() req,
+    @UploadedFile() image?: Express.Multer.File
+  ) {
+    // Conversion explicite des champs numériques
+    const parsedDto = {
+      ...dto,
+      montantTotal: Number(dto.montantTotal),
+      rendement: Number(dto.rendement),
+      duree: Number(dto.duree)
+    };
+    
+    const promoteurId = req.user.userId;
+    return this.projetsService.create(parsedDto, promoteurId, image);
   }
 
   @Patch(':id')
   @Roles('promoteur', 'admin')
-  async update(@Param('id') id: string, @Body() dto: UpdateProjetDto) {
-    return this.projetsService.update(id, dto);
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateProjetDto,
+    @UploadedFile() image?: Express.Multer.File
+  ) {
+    return this.projetsService.update(id, dto, image);
   }
 
   @Delete(':id')

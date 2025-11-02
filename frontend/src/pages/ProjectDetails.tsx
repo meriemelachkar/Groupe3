@@ -79,8 +79,8 @@ const ProjectDetailsPage: React.FC = () => {
 
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="h-96 bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-              {project.images && project.images.length > 0 ? (
-                <img src={project.images[0]} alt={project.titre} className="w-full h-full object-cover" />
+              {project.imageUrl ? (
+                <img src={project.imageUrl} alt={project.titre} className="w-full h-full object-cover" />
               ) : (
                 <Target className="text-white" size={96} />
               )}

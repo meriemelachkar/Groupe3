@@ -34,6 +34,8 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
         rendement: 0,
         duree: 12,
     });
+    const [projectImage, setProjectImage] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     useEffect(() => {
         loadProjects();
@@ -45,7 +47,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
             // backend returns an array of Projet objects
             setProjects(res.data || []);
         } catch (error) {
-              console.error('Erreur lors du chargement des projets :', error);
+            console.error('Erreur lors du chargement des projets :', error);
         } finally {
             setLoading(false);
         }
@@ -186,89 +188,89 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
                         ) : (
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {filteredProjects.map((project) => {
-                                const progress = getProgressPercentage(project);
-                                const statusBadge = getStatusBadge(project.statut || (project as any).status || 'en_cours');
+                                    const progress = getProgressPercentage(project);
+                                    const statusBadge = getStatusBadge(project.statut || (project as any).status || 'en_cours');
 
-                                return (
-                                    <div
-                                        key={project._id || (project as any).id}
-                                        onClick={() => {
-                                            if (onSelectProject) return onSelectProject(project);
-                                            const pid = project._id || (project as any).id;
-                                            if (pid) navigate(`/projects/${pid}`);
-                                        }}
-                                        className="bg-white rounded-lg shadow hover:shadow-xl transition cursor-pointer overflow-hidden"
-                                    >
-                                        <div className="h-48 bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-                                            {project.images && project.images.length > 0 ? (
-                                                <img src={project.images[0]} alt={project.titre} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Building2 className="text-white" size={64} />
-                                            )}
-                                        </div>
-
-                                        <div className="p-6">
-                                            <div className="flex items-start justify-between mb-3">
-                                                <h3 className="text-xl font-bold text-slate-900 flex-1">{project.titre}</h3>
-                                                <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.class}`}>
-                                                    {statusBadge.label}
-                                                </span>
+                                    return (
+                                        <div
+                                            key={project._id || (project as any).id}
+                                            onClick={() => {
+                                                if (onSelectProject) return onSelectProject(project);
+                                                const pid = project._id || (project as any).id;
+                                                if (pid) navigate(`/projects/${pid}`);
+                                            }}
+                                            className="bg-white rounded-lg shadow hover:shadow-xl transition cursor-pointer overflow-hidden"
+                                        >
+                                            <div className="h-48 bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+                                                {project.imageUrl ? (
+                                                    <img src={project.imageUrl} alt={project.titre} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <Building2 className="text-white" size={64} />
+                                                )}
                                             </div>
 
-                                            <div className="flex items-center text-slate-600 mb-4">
-                                                <MapPin size={16} className="mr-1" />
-                                                <span className="text-sm">{project.localisation || (project as any).location}</span>
-                                            </div>
-
-                                            <div className="space-y-3 mb-4">
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-slate-600">Objectif</span>
-                                                    <span className="font-semibold text-slate-900">
-                                                        {(project.montantTotal || (project as any).target_amount || 0).toLocaleString('fr-FR')} €
+                                            <div className="p-6">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <h3 className="text-xl font-bold text-slate-900 flex-1">{project.titre}</h3>
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${statusBadge.class}`}>
+                                                        {statusBadge.label}
                                                     </span>
                                                 </div>
-                                                <div>
-                                                    <div className="flex justify-between text-sm mb-1">
-                                                        <span className="text-slate-600">Progression</span>
-                                                        <span className="font-semibold text-emerald-600">
-                                                            {progress.toFixed(1)}%
+
+                                                <div className="flex items-center text-slate-600 mb-4">
+                                                    <MapPin size={16} className="mr-1" />
+                                                    <span className="text-sm">{project.localisation || (project as any).location}</span>
+                                                </div>
+
+                                                <div className="space-y-3 mb-4">
+                                                    <div className="flex justify-between text-sm">
+                                                        <span className="text-slate-600">Objectif</span>
+                                                        <span className="font-semibold text-slate-900">
+                                                            {(project.montantTotal || (project as any).target_amount || 0).toLocaleString('fr-FR')} €
                                                         </span>
                                                     </div>
-                                                    <div className="w-full bg-slate-200 rounded-full h-2">
-                                                        <div
-                                                            className="bg-emerald-600 h-2 rounded-full transition-all"
-                                                            style={{ width: `${progress}%` }}
-                                                        ></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-4 mb-4">
-                                                <div className="flex items-center gap-2">
-                                                    <TrendingUp size={16} className="text-emerald-600" />
                                                     <div>
-                                                        <div className="text-xs text-slate-600">Rendement</div>
-                                                        <div className="font-semibold text-slate-900">{((project.expected_return ?? (project as any).rendement) || '—')}%</div>
+                                                        <div className="flex justify-between text-sm mb-1">
+                                                            <span className="text-slate-600">Progression</span>
+                                                            <span className="font-semibold text-emerald-600">
+                                                                {progress.toFixed(1)}%
+                                                            </span>
+                                                        </div>
+                                                        <div className="w-full bg-slate-200 rounded-full h-2">
+                                                            <div
+                                                                className="bg-emerald-600 h-2 rounded-full transition-all"
+                                                                style={{ width: `${progress}%` }}
+                                                            ></div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar size={16} className="text-emerald-600" />
-                                                    <div>
-                                                        <div className="text-xs text-slate-600">Durée</div>
-                                                        <div className="font-semibold text-slate-900">{(project.duree ?? (project as any).duree ?? '—')} mois</div>
-                                                    </div>
-                                                </div>
-                                            </div>
 
-                                            <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition">
-                                                Voir le projet
-                                            </button>
+                                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <TrendingUp size={16} className="text-emerald-600" />
+                                                        <div>
+                                                            <div className="text-xs text-slate-600">Rendement</div>
+                                                            <div className="font-semibold text-slate-900">{((project.expected_return ?? (project as any).rendement) || '—')}%</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Calendar size={16} className="text-emerald-600" />
+                                                        <div>
+                                                            <div className="text-xs text-slate-600">Durée</div>
+                                                            <div className="font-semibold text-slate-900">{(project.duree ?? (project as any).duree ?? '—')} mois</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition">
+                                                    Voir le projet
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ))}
+                                    );
+                                })}
+                            </div>
+                        ))}
                     {/* Create project modal (promoteur) */}
                     {showCreateModal && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -310,48 +312,143 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
                                         <label className="block text-sm text-slate-600 mb-1">Description</label>
                                         <textarea value={newProject.description || ''} onChange={(e) => setNewProject({ ...newProject, description: e.target.value })} className="w-full border px-3 py-2 rounded h-28" />
                                     </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm text-slate-600 mb-1">Image du projet</label>
+                                        <div className="flex items-start gap-4">
+                                            <div className="flex-1">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            setProjectImage(file);
+                                                            const url = URL.createObjectURL(file);
+                                                            setPreviewUrl(url);
+                                                        }
+                                                    }}
+                                                    className="w-full border px-3 py-2 rounded"
+                                                />
+                                            </div>
+                                            {previewUrl && (
+                                                <div className="w-32 h-32 relative">
+                                                    <img
+                                                        src={previewUrl}
+                                                        alt="Aperçu"
+                                                        className="w-full h-full object-cover rounded"
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            setProjectImage(null);
+                                                            setPreviewUrl(null);
+                                                        }}
+                                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="mt-4 flex justify-end gap-2">
                                     <button onClick={() => setShowCreateModal(false)} className="px-4 py-2 border rounded">Annuler</button>
-                                    <button disabled={creating} onClick={async () => {
-                                        // minimal client validation respecting backend CreateProjetDto
-                                        if (!newProject.titre || !newProject.typeProjet || !newProject.montantTotal || !newProject.localisation || newProject.rendement === undefined || !newProject.duree) {
-                                            alert('Veuillez remplir tous les champs obligatoires (titre, type, montant, localisation, rendement, durée)');
-                                            return;
-                                        }
-                                        if (newProject.rendement < 0 || newProject.rendement > 100) {
-                                            alert('Le rendement doit être compris entre 0 et 100%');
-                                            return;
-                                        }
-                                        if (newProject.duree < 1) {
-                                            alert('La durée doit être d\'au moins 1 mois');
-                                            return;
-                                        }
-                                        try {
-                                            setCreating(true);
-                                            // Convert numeric fields explicitly to ensure they are numbers
-                                            const payload = {
-                                                titre: String(newProject.titre || '').trim(),
-                                                description: String(newProject.description || '').trim(),
-                                                typeProjet: newProject.typeProjet,
-                                                montantTotal: Number(newProject.montantTotal || 0),
-                                                localisation: String(newProject.localisation || '').trim(),
-                                                rendement: Number(newProject.rendement || 0),
-                                                duree: Number(newProject.duree || 12),
-                                            };
-                                            await api.post('/projets', payload);
-                                            setShowCreateModal(false);
-                                            // reset and reload
-                                            setNewProject({ titre: '', description: '', typeProjet: 'construction', montantTotal: 0, localisation: '' });
-                                            loadProjects();
-                                        } catch (err: any) {
-                                            console.error('Erreur création projet:', err);
-                                            alert(err?.response?.data?.message || err?.message || 'Erreur lors de la création');
-                                        } finally {
-                                            setCreating(false);
-                                        }
-                                    }} className="px-4 py-2 bg-emerald-600 text-white rounded disabled:opacity-60">{creating ? 'Création...' : 'Créer le projet'}</button>
+                                    <button
+                                        disabled={creating}
+                                        onClick={async () => {
+                                            // minimal client validation respecting backend CreateProjetDto
+                                            if (
+                                                !newProject.titre ||
+                                                !newProject.typeProjet ||
+                                                !newProject.montantTotal ||
+                                                !newProject.localisation ||
+                                                newProject.rendement === undefined ||
+                                                !newProject.duree
+                                            ) {
+                                                alert(
+                                                    "Veuillez remplir tous les champs obligatoires (titre, type, montant, localisation, rendement, durée)"
+                                                );
+                                                return;
+                                            }
+                                            if (newProject.rendement < 0 || newProject.rendement > 100) {
+                                                alert("Le rendement doit être compris entre 0 et 100%");
+                                                return;
+                                            }
+                                            if (newProject.duree < 1) {
+                                                alert("La durée doit être d'au moins 1 mois");
+                                                return;
+                                            }
+
+                                            try {
+                                                setCreating(true);
+
+                                                // Convert numeric fields explicitly to ensure they are numbers
+                                                const formData = new FormData();
+
+                                                // Validation et ajout des champs obligatoires
+                                                if (!newProject.titre) throw new Error("Le titre est requis");
+                                                formData.append("titre", newProject.titre.trim());
+
+                                                if (newProject.description) {
+                                                    formData.append("description", newProject.description.trim());
+                                                }
+
+                                                if (!newProject.typeProjet) throw new Error("Le type de projet est requis");
+                                                formData.append("typeProjet", newProject.typeProjet);
+
+                                                if (!newProject.montantTotal) throw new Error("Le montant total est requis");
+                                                formData.append("montantTotal", String(newProject.montantTotal));
+
+                                                if (!newProject.localisation) throw new Error("La localisation est requise");
+                                                formData.append("localisation", newProject.localisation.trim());
+
+                                                if (typeof newProject.rendement !== "number")
+                                                    throw new Error("Le rendement est requis");
+                                                formData.append("rendement", String(newProject.rendement));
+
+                                                if (!newProject.duree) throw new Error("La durée est requise");
+                                                formData.append("duree", String(newProject.duree));
+
+                                                // Ajout de l'image si elle existe
+                                                if (projectImage) {
+                                                    formData.append("image", projectImage);
+                                                }
+
+                                                await api.post("/projets", formData, {
+                                                    headers: {
+                                                        "Content-Type": "multipart/form-data",
+                                                    },
+                                                });
+
+                                                setShowCreateModal(false);
+                                                // reset and reload
+                                                setNewProject({
+                                                    titre: "",
+                                                    description: "",
+                                                    typeProjet: "construction",
+                                                    montantTotal: 0,
+                                                    localisation: "",
+                                                });
+                                                setProjectImage(null);
+                                                setPreviewUrl(null);
+                                                loadProjects();
+                                            } catch (err: any) {
+                                                console.error("Erreur création projet:", err);
+                                                alert(
+                                                    err?.response?.data?.message ||
+                                                    err?.message ||
+                                                    "Erreur lors de la création"
+                                                );
+                                            } finally {
+                                                setCreating(false);
+                                            }
+                                        }}
+                                        className="px-4 py-2 bg-emerald-600 text-white rounded disabled:opacity-60"
+                                    >
+                                        {creating ? "Création..." : "Créer le projet"}
+                                    </button>
+
                                 </div>
                             </div>
                         </div>
