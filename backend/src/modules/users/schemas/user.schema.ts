@@ -9,6 +9,9 @@ export class User extends Document {
   @Prop({ required: true }) motDePasse: string;
   @Prop({ enum: ['investisseur', 'promoteur', 'acheteur', 'admin'], default: 'acheteur' })
   role: string;
+
+  @Prop()
+  photoUrl?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

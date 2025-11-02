@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import NavBar from "../components/Navbar";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Camera, X } from "lucide-react";
 import { registerUser } from "../api/authApi";
 
 export default function SignUp() {
@@ -13,6 +13,9 @@ export default function SignUp() {
     confirmPassword: "",
   });
 
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -21,6 +24,26 @@ export default function SignUp() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePicture(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removePhoto = () => {
+    setProfilePicture(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +59,18 @@ export default function SignUp() {
     }
 
     try {
-      const res = await registerUser(formData);
+      // Créer un FormData pour envoyer les données du formulaire et la photo
+      const submitData = new FormData();
+      submitData.append('prenom', formData.firstName);
+      submitData.append('nom', formData.lastName);
+      submitData.append('email', formData.email);
+      submitData.append('role', formData.role.toLowerCase());
+      submitData.append('motDePasse', formData.password);
+      if (profilePicture) {
+        submitData.append('photo', profilePicture);
+      }
+
+      const res = await registerUser(submitData);
       setSuccess("Compte créé avec succès !");
       console.log("✅ Utilisateur inscrit :", res);
     } catch (err: any) {
@@ -167,6 +201,52 @@ export default function SignUp() {
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="••••••••"
               />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700">
+                Photo de profil (optionnel)
+              </label>
+              <div className="flex items-center gap-4">
+                <div className="relative w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center overflow-hidden">
+                  {previewUrl ? (
+                    <>
+                      <img
+                        src={previewUrl}
+                        alt="Photo de profil"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={removePhoto}
+                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full h-full flex items-center justify-center hover:bg-slate-200 transition-colors"
+                    >
+                      <Camera size={24} className="text-slate-400" />
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <div className="text-sm text-slate-600">
+                  {previewUrl
+                    ? "Cliquez sur la photo pour la modifier"
+                    : "Cliquez pour ajouter une photo"}
+                </div>
+              </div>
             </div>
 
             <button
