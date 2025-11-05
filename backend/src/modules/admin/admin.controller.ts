@@ -12,7 +12,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  // 👥 UTILISATEURS
+  // UTILISATEURS
   @Get('users')
   getAllUsers() {
     return this.adminService.getAllUsers();
@@ -50,13 +50,13 @@ export class AdminController {
     return this.adminService.getAllInvestissements();
   }
 
-  // 💳 TRANSACTIONS
+  //  TRANSACTIONS
   @Get('transactions')
   getAllTransactions() {
     return this.adminService.getAllTransactions();
   }
 
-  // 💬 MESSAGES
+  //  MESSAGES
   @Get('messages')
   getAllMessages() {
     return this.adminService.getAllMessages();
@@ -66,7 +66,7 @@ export class AdminController {
   deleteMessage(@Param('id') id: string) {
     return this.adminService.deleteMessage(id);
   }
-  // 📊 Tableau de bord admin
+  //  Tableau de bord admin
 @Get('dashboard')
 getDashboard() {
   return this.adminService.getDashboard();
