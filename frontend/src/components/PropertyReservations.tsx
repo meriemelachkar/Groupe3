@@ -12,29 +12,11 @@ const PropertyReservations: React.FC<Props> = ({ propertyId, onClose, onUpdated 
   const [reservations, setReservations] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const computeMonthlyPayment = (loanSimulation: any) => {
-    if (!loanSimulation) return null;
-    const principal = Number(loanSimulation.loanAmount || 0);
-    const annualRate = Number(loanSimulation.interestRate || 0) / 100;
-    const years = Number(loanSimulation.duration || 0);
-    if (!principal || !years) return null;
-
-    const monthlyRate = annualRate / 12;
-    const n = years * 12;
-    const A = monthlyRate === 0 ? principal / n : (monthlyRate * principal) / (1 - Math.pow(1 + monthlyRate, -n));
-    const total = A * n;
-    const totalInterest = total - principal;
-    return {
-      monthly: A,
-      total,
-      totalInterest,
-    };
-  };
 
   const load = async () => {
     setLoading(true);
     try {
-      // use dashboard endpoint to fetch bien details and its reservation (populated)
+      // use dashboard endpoint to fetch bien details and its reservation 
       const res = await api.get(`/dashboard/promoteur/${propertyId}`);
       const data = res.data || {};
       const reservation = data.reservation ? [data.reservation] : [];
@@ -98,10 +80,6 @@ const PropertyReservations: React.FC<Props> = ({ propertyId, onClose, onUpdated 
               </div>
 
               <div className="mt-3 grid md:grid-cols-3 gap-4">
-                {/* <div>
-                  <div className="text-sm text-slate-600">Prix demandé</div>
-                  <div className="font-semibold">{(r.propertyId?.prix ?? 0).toLocaleString('fr-FR')} €</div>
-                </div> */}
                 <div>
                   <div className="text-sm text-slate-600">Statut</div>
                   <div className="font-semibold">{r.status}</div>
@@ -115,53 +93,6 @@ const PropertyReservations: React.FC<Props> = ({ propertyId, onClose, onUpdated 
                   )}
                 </div>
               </div>
-
-              {/* Afficher la simulation de prêt si présente */}
-              {r.loanSimulation && (
-                <div className="mt-4 bg-slate-50 p-4 rounded">
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="text-sm text-slate-600 font-medium">Simulation de prêt</div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 text-sm text-slate-700 mb-3">
-                    <div>
-                      <div className="text-xs text-slate-500">Montant emprunté</div>
-                      <div className="font-semibold">{(r.loanSimulation.loanAmount || 0).toLocaleString('fr-FR')} €</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500">Taux (%)</div>
-                      <div className="font-semibold">{r.loanSimulation.interestRate ?? '—'}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500">Durée (ans)</div>
-                      <div className="font-semibold">{r.loanSimulation.duration ?? '—'}</div>
-                    </div>
-                  </div>
-
-                  <div className="text-sm text-slate-700">
-                    {(() => {
-                      const calc = computeMonthlyPayment(r.loanSimulation);
-                      if (!calc) return <div>Simulation incomplète</div>;
-                      return (
-                        <div className="grid grid-cols-3 gap-4">
-                          <div>
-                            <div className="text-xs text-slate-500">Mensualité</div>
-                            <div className="font-semibold">{calc.monthly.toFixed(2).toString().replace('.', ',')} €</div>
-                          </div>
-                          <div>
-                            <div className="text-xs text-slate-500">Coût total</div>
-                            <div className="font-semibold">{calc.total.toFixed(2).toString().replace('.', ',')} €</div>
-                          </div>
-                          <div>
-                            <div className="text-xs text-slate-500">Intérêts</div>
-                            <div className="font-semibold">{calc.totalInterest.toFixed(2).toString().replace('.', ',')} €</div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </div>
-              )}
             </div>
           ))}
         </div>

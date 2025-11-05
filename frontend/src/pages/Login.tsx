@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 💡 Utiliser useNavigate pour la redirection React
+import { useNavigate } from 'react-router-dom'; 
 import NavBar from "../components/Navbar";
 import { LogIn } from 'lucide-react';
-// import { loginUser } from '../api/authApi'; // ❌ N'est plus nécessaire ici
-
-// 💡 Importez le hook useAuth
-import { useAuth } from '../context/AuthContext'; // Ajustez le chemin si nécessaire
+import { useAuth } from '../context/AuthContext'; 
 
 export default function LoginForm() {
-  // 💡 Récupérer la fonction signIn et l'état de l'utilisateur (pour le 'loading' si besoin)
   const { signIn, loading: authLoading } = useAuth();
-  const navigate = useNavigate(); // Hook pour la navigation React
-
+  const navigate = useNavigate(); 
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
   const [error, setError] = useState('');
-  const [localLoading, setLocalLoading] = useState(false); // État de chargement local pour le formulaire
-
-  // Combiner les états de chargement
+  const [localLoading, setLocalLoading] = useState(false); 
   const loading = localLoading || authLoading;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,23 +19,10 @@ export default function LoginForm() {
     setLocalLoading(true);
 
     try {
-      // 🚀 Utiliser la fonction signIn du contexte, qui gère tout :
-      // 1. Appel à loginUser
-      // 2. Stockage dans localStorage (token et userId)
-      // 3. Mise à jour de l'état global React (user)
       const userId = await signIn({ email, motDePasse });
       console.log('Connexion réussie. UserId retourné par signIn:', userId);
-
-      // 💡 Redirection React recommandée.
-      // Dans une architecture avec AuthProvider, la redirection est souvent gérée 
-      // par un `useEffect` dans un composant parent ou dans le AuthProvider,
-      // mais ici, nous utilisons la redirection immédiate.
       navigate('/');
-
-      // ⚠️ Note: Les lignes de localStorage sont maintenant dans AuthProvider
-      // et ne sont plus nécessaires ici.
     } catch (err: any) {
-      // L'erreur est levée par signIn()
       setError(err.message || 'Erreur de connexion');
     } finally {
       setLocalLoading(false);

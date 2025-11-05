@@ -184,7 +184,6 @@ const ProjectDetailsPage: React.FC = () => {
           onClose={() => setShowInvestModal(false)}
           onSuccess={() => {
             setShowInvestModal(false);
-            // reload project data to reflect new collecte
             if (project._id) loadProject(project._id);
           }}
         />

@@ -13,7 +13,6 @@ const InvestmentModal: React.FC<InvestmentModalProps> = ({ project, onClose, onS
   const [amount, setAmount] = useState<number>(project.min_investment ?? 100);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  // api instance injects the token; no client-side user checks required here
 
   const calculateReturn = () => {
     return (amount * (project.rendement ?? 0)) / 100;

@@ -12,7 +12,6 @@ export const registerUser = async (data: RegisterData | FormData) => {
   let payload: any;
   
   if (data instanceof FormData) {
-    // Les données sont déjà dans le bon format pour l'envoi
     payload = data;
   } else {
     // Mapper les noms de champs du frontend vers ceux du backend
@@ -21,7 +20,7 @@ export const registerUser = async (data: RegisterData | FormData) => {
       prenom: data.firstName,
       email: data.email,
       motDePasse: data.password,
-      role: data.role.toLowerCase(), // pour correspondre à l'enum Mongoose
+      role: data.role.toLowerCase(),
     };
   }
 

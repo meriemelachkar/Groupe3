@@ -369,7 +369,6 @@ const PropertiesList: React.FC = () => {
                           projetAssocieId: newBien.projetAssocieId ? (newBien.projetAssocieId as string) : undefined,
                         };
 
-                        // Remove undefined keys so ValidationPipe with forbidNonWhitelisted won't complain
                         const payload: Record<string, any> = {};
                         Object.entries(rawPayload).forEach(([k, v]) => {
                           if (v !== undefined && v !== '') payload[k] = v;

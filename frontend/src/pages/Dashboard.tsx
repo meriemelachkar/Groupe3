@@ -39,7 +39,6 @@ export const Dashboard: React.FC = () => {
 
             try {
                 if (profile?.role === 'acheteur') {
-                    // Backend might not expose /reservations/me; try and fallback to []
                     const res = await api.get('/reservations/me');
                     setReservations(res.data || []);
                 }
@@ -107,14 +106,14 @@ export const Dashboard: React.FC = () => {
         return Number.isFinite(n) ? n : 0;
     };
 
-    // Helper to produce a localized badge for project status (supports French and older English keys)
+
     const getProjectStatusBadge = (status: string) => {
         const s = (status || '').toString();
         const map: Record<string, { label: string; cls: string }> = {
             en_cours: { label: 'En financement', cls: 'bg-emerald-100 text-emerald-800' },
             financé: { label: 'Financé', cls: 'bg-slate-100 text-slate-800' },
             terminé: { label: 'Terminé', cls: 'bg-slate-200 text-slate-800' },
-            // older English values
+            // older English values (just au cas ou)
             funding: { label: 'En financement', cls: 'bg-emerald-100 text-emerald-800' },
             funded: { label: 'Financé', cls: 'bg-slate-100 text-slate-800' },
             approved: { label: 'Approuvé', cls: 'bg-blue-100 text-blue-800' },
@@ -127,7 +126,6 @@ export const Dashboard: React.FC = () => {
         if (!confirm('Voulez-vous annuler cette réservation ?')) return;
         try {
             await cancelReservation(reservationId);
-            // remove from state
             setReservations((prev) => prev.filter((r) => (r._id || r.id) !== reservationId));
             alert('Réservation annulée');
         } catch (err: any) {
@@ -165,7 +163,7 @@ export const Dashboard: React.FC = () => {
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-slate-900">Tableau de Bord</h1>
                         <p className="text-slate-600 mt-2">
-                            {/* Bienvenue, {profile?.full_name} ({profile?.role}) */}
+
                         </p>
                     </div>
 
@@ -339,7 +337,7 @@ export const Dashboard: React.FC = () => {
                                                     <p className="text-slate-600">{reservation.propertyId?.adresse}</p>
                                                 </div>
                                                 {(() => {
-                                                    // adapter les statuts côté client aux nouveaux valeurs françaises
+                                                    
                                                     const s = reservation.status;
                                                     const label = s === 'en_attente' ? 'En attente' : s === 'accepte' ? 'Acceptée' : 'Rejetée';
                                                     const cls = s === 'accepte' ? 'bg-emerald-100 text-emerald-800' : s === 'en_attente' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';

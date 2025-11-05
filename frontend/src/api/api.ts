@@ -34,8 +34,6 @@ api.interceptors.response.use(
       localStorage.removeItem('userId');
       localStorage.removeItem('userName');
       localStorage.removeItem('profile');
-      // Rediriger vers la page de connexion si nécessaire
-      // window.location.href = '/login';
     }
     
     return Promise.reject(error);

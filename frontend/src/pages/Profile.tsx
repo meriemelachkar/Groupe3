@@ -80,24 +80,6 @@ export const Profile: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* <div className="space-y-6">
-                                <h2 className="text-xl font-semibold text-slate-900">Statistiques</h2>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <div className="text-sm text-slate-600">Investissements</div>
-                                        <div className="text-2xl font-semibold text-slate-900">
-                                            {profile.nombreInvestissements || 0}
-                                        </div>
-                                    </div>
-                                    <div className="bg-slate-50 p-4 rounded-lg">
-                                        <div className="text-sm text-slate-600">Montant Total</div>
-                                        <div className="text-2xl font-semibold text-emerald-600">
-                                            {(profile.montantTotalInvesti || 0).toLocaleString('fr-FR')} €
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> */}
                         </div>
                     </div>
                 </div>

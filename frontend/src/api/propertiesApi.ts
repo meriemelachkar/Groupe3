@@ -18,9 +18,6 @@ export interface Bien {
  * Authorization: Bearer <token> pour identifier l'utilisateur.
  */
 export const fetchBiens = async (): Promise<Bien[]> => {
-  // L'instance axios (`api`) possède un intercepteur qui ajoute le token
-  // automatiquement depuis localStorage si présent. Ici, on délègue la
-  // responsabilité de l'injection du header à cet intercepteur.
   const res = await api.get("/biens");
   return res.data;
 };

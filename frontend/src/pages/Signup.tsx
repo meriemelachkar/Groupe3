@@ -72,7 +72,7 @@ export default function SignUp() {
 
       const res = await registerUser(submitData);
       setSuccess("Compte créé avec succès !");
-      console.log("✅ Utilisateur inscrit :", res);
+      console.log("Utilisateur inscrit :", res);
     } catch (err: any) {
       console.error("Erreur d'inscription:", err);
       setError(err.response?.data?.message || "Erreur lors de l'inscription");

@@ -30,7 +30,7 @@ interface AuthContextType {
     signOut: () => void;
     updateProfilePicture: (file: File) => Promise<void>;
 }
-// ---------------------------------------------------
+
 
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -69,7 +69,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Fonction pour charger le profil depuis le backend
     const loadProfile = async (userId: string, token: string) => {
         try {
-            // Assurez-vous que l'URL est correcte et pointe vers un endpoint qui retourne le profil complet
             const res = await fetch(`http://localhost:3000/users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -117,28 +116,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     
-    const signIn = async (data: { email: string; motDePasse: string }): Promise<string> => { // Changement du type de retour
+    const signIn = async (data: { email: string; motDePasse: string }): Promise<string> => { 
         try {
             const res = await loginUser(data);
             console.log('Connexion réussie:', res);
 
             const token: string = res.token;
-            // 💡 Récupération de l'ID depuis la réponse du backend
             const userId: string = res.user._id; 
             console.log('User reçu du backend:', res.user);
 
-            // Mise à jour de l'état (asynchrone)
             setUser({ token, userId });
 
-            // Sauvegarder dans localStorage (synchrone et immédiat)
             localStorage.setItem('token', token);
             localStorage.setItem('userId', userId);
-            // Je supprime localStorage.setItem('userName', userName) car 'profile' contient le nom complet
 
-            // Chargement et sauvegarde du profil
+
             await loadProfile(userId, token);
             
-            // Retourne l'ID pour une utilisation immédiate dans le composant appelant
             return userId; 
 
         } catch (err) {
