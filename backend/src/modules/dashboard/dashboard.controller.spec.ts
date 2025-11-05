@@ -23,11 +23,11 @@ describe('DashboardController', () => {
     controller = module.get<DashboardController>(DashboardController);
   });
 
-  it('✅ contrôleur défini', () => {
+  it(' contrôleur défini', () => {
     expect(controller).toBeDefined();
   });
 
-  it('📊 doit retourner les données du promoteur', async () => {
+  it(' doit retourner les données du promoteur', async () => {
     const req = { user: { userId: '123' } };
     const res = await controller.getDashboardPromoteur(req);
     expect(res).toEqual({ projets: 2 });

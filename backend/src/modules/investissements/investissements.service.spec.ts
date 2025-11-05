@@ -24,7 +24,7 @@ describe('InvestissementsService', () => {
     service = module.get<InvestissementsService>(InvestissementsService);
   });
 
-  it('✅ InvestissementsService défini', () => {
+  it(' InvestissementsService défini', () => {
     expect(service).toBeDefined();
   });
 });

@@ -18,11 +18,11 @@ describe('ProjetsController', () => {
     controller = module.get<ProjetsController>(ProjetsController);
   });
 
-  it('✅ défini', () => {
+  it(' défini', () => {
     expect(controller).toBeDefined();
   });
 
-  it('📋 doit retourner la liste des projets', async () => {
+  it(' doit retourner la liste des projets', async () => {
     const res = await controller.findAll();
     expect(res).toEqual([{ _id: '1', titre: 'Projet Test' }]);
   });

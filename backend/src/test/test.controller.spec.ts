@@ -18,11 +18,11 @@ describe('TestController', () => {
     controller = module.get<TestController>(TestController);
   });
 
-  it('✅ TestController défini', () => {
+  it(' TestController défini', () => {
     expect(controller).toBeDefined();
   });
 
-  it('📋 doit retourner le message', () => {
+  it(' doit retourner le message', () => {
     expect(controller.getHello()).toBe('Hello World!');
   });
 });

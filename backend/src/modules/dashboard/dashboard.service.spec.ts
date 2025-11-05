@@ -24,7 +24,7 @@ describe('DashboardService', () => {
     service = module.get<DashboardService>(DashboardService);
   });
 
-  it('✅ DashboardService défini', () => {
+  it(' DashboardService défini', () => {
     expect(service).toBeDefined();
   });
 });

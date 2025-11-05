@@ -21,5 +21,5 @@ describe('MessagesService', () => {
     service = module.get<MessagesService>(MessagesService);
   });
 
-  it('✅ MessagesService défini', () => expect(service).toBeDefined());
+  it(' MessagesService défini', () => expect(service).toBeDefined());
 });

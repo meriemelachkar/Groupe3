@@ -22,11 +22,11 @@ describe('MessagesController', () => {
     controller = module.get<MessagesController>(MessagesController);
   });
 
-  it('✅ contrôleur défini', () => {
+  it(' contrôleur défini', () => {
     expect(controller).toBeDefined();
   });
 
-  it('💬 doit retourner les messages de l’utilisateur connecté', async () => {
+  it(' doit retourner les messages de l’utilisateur connecté', async () => {
     const req = { user: { userId: '1' } };
     const res = await controller.findByUser(req);
     expect(mockMessagesService.findByUser).toHaveBeenCalledWith('1');

@@ -17,7 +17,7 @@ describe('AdminController', () => {
     controller = module.get<AdminController>(AdminController);
   });
 
-  it('✅ AdminController défini', () => {
+  it(' AdminController défini', () => {
     expect(controller).toBeDefined();
   });
 });

@@ -36,11 +36,11 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
   });
 
-  it('✅ AuthService défini', () => {
+  it(' AuthService défini', () => {
     expect(service).toBeDefined();
   });
 
-  it('🔐 login renvoie un token', async () => {
+  it(' login renvoie un token', async () => {
     const dto = { email: 'test@test.com', motDePasse: '123456' };
     const result = await service.login(dto);
      expect(result).toHaveProperty('token', 'mock-token');

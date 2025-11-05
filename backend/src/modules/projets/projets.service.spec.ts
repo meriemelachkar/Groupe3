@@ -20,7 +20,7 @@ describe('ProjetsService', () => {
     service = module.get<ProjetsService>(ProjetsService);
   });
 
-  it('✅ ProjetsService défini', () => {
+  it(' ProjetsService défini', () => {
     expect(service).toBeDefined();
   });
 });

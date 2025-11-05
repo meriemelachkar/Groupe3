@@ -18,11 +18,11 @@ describe('AuthController', () => {
     controller = module.get<AuthController>(AuthController);
   });
 
-  it('✅ contrôleur défini', () => {
+  it(' contrôleur défini', () => {
     expect(controller).toBeDefined();
   });
 
-  it('📋 login appelle le service', async () => {
+  it(' login appelle le service', async () => {
     const res = await controller.login({ email: 'test@mail.com', motDePasse: '123456' });
     expect(res.token).toBe('fake-jwt-token');
   });

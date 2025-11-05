@@ -20,11 +20,11 @@ describe('InvestissementsController', () => {
     controller = module.get<InvestissementsController>(InvestissementsController);
   });
 
-  it('✅ contrôleur défini', () => {
+  it(' contrôleur défini', () => {
     expect(controller).toBeDefined();
   });
 
-  it('💰 doit retourner tous les investissements', async () => {
+  it(' doit retourner tous les investissements', async () => {
     const res = await controller.findAll();
     expect(res).toEqual([{ _id: 'i1', montant: 2000 }]);
   });

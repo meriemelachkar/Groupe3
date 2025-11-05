@@ -18,11 +18,11 @@ describe('BiensController', () => {
     controller = module.get<BiensController>(BiensController);
   });
 
-  it('✅ devrait être défini', () => {
+  it(' devrait être défini', () => {
     expect(controller).toBeDefined();
   });
 
-  it('📋 doit retourner tous les biens', async () => {
+  it(' doit retourner tous les biens', async () => {
     const res = await controller.findAll();
     expect(res).toEqual([{ _id: 'b1', titre: 'Appartement Tunis' }]);
   });

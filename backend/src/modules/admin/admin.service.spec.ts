@@ -31,16 +31,16 @@ describe('AdminService', () => {
     service = module.get<AdminService>(AdminService);
   });
 
-  it('✅ Service défini', () => {
+  it(' Service défini', () => {
     expect(service).toBeDefined();
   });
 
-  it('📊 Devrait retourner un tableau vide pour les messages', async () => {
+  it(' Devrait retourner un tableau vide pour les messages', async () => {
     const result = await service.getAllMessages();
     expect(result).toEqual([]);
   });
 
-  it('📈 Devrait retourner des statistiques du tableau de bord', async () => {
+  it(' Devrait retourner des statistiques du tableau de bord', async () => {
     const result = await service.getDashboard();
     expect(result).toHaveProperty('utilisateurs');
     expect(result).toHaveProperty('projets');
