@@ -51,6 +51,6 @@ async function bootstrap() {
 
   // 🚀 Démarrage du serveur
   await app.listen(port);
-  console.log(`🚀 Application running on: ${await app.getUrl()}`);
+  console.log(` Application running on: ${await app.getUrl()}`);
 }
 bootstrap();
